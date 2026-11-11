@@ -417,6 +417,7 @@ final class Workspace: ObservableObject {
         else if name.contains("blues") { candidates = ["BigBandBlues", "TheBlues"] }
         else if name.contains("swing") || name.contains("jazz") { candidates = ["BigBandSwing", "JazzClub"] }
         else if name.contains("samba") { candidates = ["Samba"] }
+        else if name.contains("pop") { candidates = ["SkyPop"] }
         else { candidates = [] }
         for candidate in candidates {
             if let entry = entries.first(where: { $0.originalName == candidate }),

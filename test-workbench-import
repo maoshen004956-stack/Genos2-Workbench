@@ -11,6 +11,7 @@ swiftc -target "$target" -module-cache-path "$build/modules" -emit-library -stat
 
 set -- "$@"
 fixture=${1:-}
+second_fixture=${2:-}
 for test in IRealImportTests VerifyProject; do
     app="$build/$test.app"
     mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources/Genos2/pop"
@@ -23,7 +24,11 @@ for test in IRealImportTests VerifyProject; do
     swiftc -target "$target" -module-cache-path "$build/modules" -I "$build" -L "$build" -lSXCore \
         "$@" "$folder/Tests/$test.swift" -o "$app/Contents/MacOS/check"
     if [ "$test" = IRealImportTests ] && [ -n "$fixture" ]; then
-        "$app/Contents/MacOS/check" "$fixture"
+        if [ -n "$second_fixture" ]; then
+            "$app/Contents/MacOS/check" "$fixture" "$second_fixture"
+        else
+            "$app/Contents/MacOS/check" "$fixture"
+        fi
     else
         "$app/Contents/MacOS/check"
     fi

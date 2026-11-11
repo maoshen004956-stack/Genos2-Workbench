@@ -5,6 +5,9 @@ struct IRealSong {
     struct Section {
         var name: String
         var bars: [String]
+        var detail: String? = nil
+        var sourceBars: [Int] = []
+        var isReturn = false
     }
 
     var title: String
@@ -171,6 +174,7 @@ enum IRealImport {
             var repeatStart: Bool
             var repeatEnd: Int?
             var ending: Int?
+            var navigation = IRealNavigation.Mark()
         }
         let input: [Character]
         let title: String
@@ -188,6 +192,10 @@ enum IRealImport {
         var previousChord: String?
         var repeatPrevious: Int?
         var twoBarRemainder: Bar?
+        var navigation = IRealNavigation.Mark()
+        var ignoreLayoutSpace = false
+        var pendingJump: IRealNavigation.Jump?
+        var pendingJumpBar: Int?
 
         init(_ music: String, title: String) { self.input = Array(music); self.title = title }
 
@@ -196,21 +204,26 @@ enum IRealImport {
             while index < input.count {
                 let char = input[index]
                 switch char {
-                case " ": slots += 1; index += 1
+                case " ": if !ignoreLayoutSpace { slots += 1 }; index += 1
                 case "\t", "\r", "\n", ",", "Y", "s", "l", "U": index += 1
-                case "|", "]", "Z": try closeBar(); index += 1
+                case "|", "]", "Z":
+                    try closeBar()
+                    if char != "|" { try finishJump() }
+                    ignoreLayoutSpace = char != "|"; index += 1
                 case "[":
                     try closeBar()
                     if !bars.isEmpty { sectionStart = true }
+                    ignoreLayoutSpace = false
                     index += 1
                 case "{":
-                    try closeBar(); repeatStart = true; index += 1
+                    try closeBar(); repeatStart = true; sectionStart = true; ignoreLayoutSpace = false; index += 1
                 case "}":
                     try closeBar()
                     guard !bars.isEmpty else { throw problem("反复结束符之前没有小节") }
                     guard bars[bars.count - 1].repeatEnd == nil else { throw problem("同一小节有重复的反复结束符") }
                     bars[bars.count - 1].repeatEnd = repeatCount
                     repeatCount = 2
+                    ignoreLayoutSpace = true
                     index += 1
                 case "*":
                     try closeBar()
@@ -230,14 +243,18 @@ enum IRealImport {
                 case "(": try alternativeChord()
                 case "x", "r":
                     guard events.isEmpty, repeatPrevious == nil else { throw problem("小节重复符与其他和弦重叠") }
-                    repeatPrevious = char == "x" ? 1 : 2; slots = 0; index += 1
+                    repeatPrevious = char == "x" ? 1 : 2; slots = 0; ignoreLayoutSpace = false; index += 1
                 case "p":
                     guard previousChord != nil || !events.isEmpty else { throw problem("延续和弦符号 p 前没有和弦") }
                     slots += 1; index += 1
                 case "n": throw problem("第 \(bars.count + 1) 小节含 N.C.（无和弦），当前伴奏引擎尚不支持，请先为该小节选择和弦")
-                case "S", "Q", "f":
-                    if char == "f" { warn("延长记号按原小节长度播放；导入后可调整速度或小节。") }
-                    else { warn("谱中含 Segno/Coda 跳转标记；没有跳转指令时按书写顺序导入。") }
+                case "S": navigation.segno = true; index += 1
+                case "Q":
+                    if hasBarContent { navigation.toCoda = true }
+                    else { navigation.codaStart = true; name = "尾奏"; sectionStart = true }
+                    index += 1
+                case "f":
+                    warn("延长记号按原小节长度播放；导入后可调整速度或小节。")
                     index += 1
                 case "A"..."G", "W": try chord()
                 default:
@@ -246,21 +263,58 @@ enum IRealImport {
                 guard bars.count <= 2_048 else { throw problem("原谱超过 2048 小节，请拆分导入") }
             }
             try closeBar()
+            try finishJump()
             guard !bars.isEmpty else { throw problem("没有找到可播放的和弦小节") }
+            guard navigation.jump == nil else { throw problem("跳转指令所在小节没有和弦") }
+            guard !navigation.segno && !navigation.codaStart && !navigation.toCoda && !navigation.fine else {
+                throw problem("谱尾的导航标记没有对应的和弦小节")
+            }
             guard !repeatStart, ending == nil else { throw problem("谱尾的反复或结尾标记后没有小节") }
             guard twoBarRemainder == nil else { throw problem("双小节重复符 r 后缺少第二小节") }
             if meter == nil && bars.contains(where: { $0.events.count > 1 }) {
                 warn("原谱未指定拍号，同小节的多个和弦暂按均分处理；导入后可填写拍数调整。")
             }
-            let expanded = try expandRepeats()
+            let expanded: [IRealNavigation.Visit]
+            do { expanded = try IRealNavigation.expand(bars.map { bar in
+                var mark = bar.navigation
+                mark.repeatStart = bar.repeatStart
+                mark.repeatEnd = bar.repeatEnd
+                mark.ending = bar.ending
+                return mark
+            }) } catch { throw problem(error.localizedDescription) }
             var sections: [IRealSong.Section] = []
-            for bar in expanded {
-                if sections.isEmpty || bar.sectionStart || sections.last?.name != bar.name {
-                    sections.append(.init(name: bar.name, bars: []))
+            var returned: [Bool] = []
+            for visit in expanded {
+                let bar = bars[visit.index]
+                if sections.isEmpty || bar.sectionStart || visit.restart || sections.last?.name != bar.name {
+                    sections.append(.init(name: bar.name, bars: [], isReturn: visit.returned))
+                    returned.append(visit.returned)
                 }
                 sections[sections.count - 1].bars.append(render(bar))
+                sections[sections.count - 1].sourceBars.append(visit.index + 1)
+            }
+            var occurrences: [String: Int] = [:]
+            for index in sections.indices {
+                let section = sections[index]
+                occurrences[section.name, default: 0] += 1
+                let source = sourceRanges(section.sourceBars)
+                let kind = returned[index] ? "返奏 · " : ""
+                sections[index].detail = "\(kind)第 \(occurrences[section.name]!) 次出现 · 原谱 \(source) 小节"
             }
             return sections
+        }
+
+        var hasBarContent: Bool { !events.isEmpty || repeatPrevious != nil || twoBarRemainder != nil || (slots >= 3 && previousChord != nil) }
+
+        func sourceRanges(_ values: [Int]) -> String {
+            var ranges: [String] = []
+            var start = values[0], end = values[0]
+            for value in values.dropFirst() {
+                if value == end + 1 { end = value }
+                else { ranges.append(start == end ? "\(start)" : "\(start)–\(end)"); start = value; end = value }
+            }
+            ranges.append(start == end ? "\(start)" : "\(start)–\(end)")
+            return ranges.joined(separator: "、")
         }
 
         mutating func timeSignature() throws {
@@ -284,11 +338,29 @@ enum IRealImport {
             var text = String(input[start..<end]).trimmingCharacters(in: .whitespaces)
             index = end + 1
             text = text.replacingOccurrences(of: #"^\*\d+"#, with: "", options: .regularExpression)
-            let lower = text.lowercased().replacingOccurrences(of: " ", with: "")
-            if lower.range(of: #"^(d\.?c\.?|d\.?s\.?|tocoda|alcoda|dacapo|dalsegno)"#, options: .regularExpression) != nil {
-                throw problem("含跳转指令「\(text)」，目前请先在 iReal Pro 中展开 D.C./D.S./Coda 跳转后导入，避免段落顺序错误")
-            }
-            if lower.range(of: #"^[0-9]+x$"#, options: .regularExpression) != nil {
+            let lower = text.lowercased().replacingOccurrences(of: #"[\s\.]"#, with: "", options: .regularExpression)
+            if let prefix = ["dalsegno", "dacapo", "ds", "dc"].first(where: { lower.hasPrefix($0) }) {
+                let suffix = String(lower.dropFirst(prefix.count))
+                let target: IRealNavigation.Target
+                switch suffix {
+                case "": target = .end
+                case "alcoda": target = .coda
+                case "alfine": target = .fine
+                case "al1stend", "al1stending": target = .ending(1)
+                case "al2ndend", "al2ndending": target = .ending(2)
+                default: throw problem("无法识别跳转指令「\(text)」，请使用 D.S./D.C. al Coda、al Fine 或 al 2nd ending")
+                }
+                guard pendingJump == nil else { throw problem("同一结束线之前包含多个跳转指令") }
+                pendingJumpBar = bars.count
+                pendingJump = .init(origin: prefix == "ds" || prefix == "dalsegno" ? .segno : .start, target: target)
+            } else if lower == "fine" { navigation.fine = true }
+            else if lower == "tocoda" || lower == "alcoda" { navigation.toCoda = true }
+            else if lower == "coda" {
+                navigation.codaStart = true; name = "尾奏"; sectionStart = true
+            } else if lower == "segno" { navigation.segno = true }
+            else if ["repeatandfade", "repeat&fade", "repeatandfadeout", "repeat&fadeout"].contains(lower) {
+                warn("Repeat and Fade：按谱面的反复次数展开（未写次数时为两遍）；原谱未指定淡出长度，保留可编辑尾奏，未自动添加淡出。")
+            } else if lower.range(of: #"^[0-9]+x$"#, options: .regularExpression) != nil {
                 guard let count = Int(lower.dropLast()), (2...16).contains(count) else {
                     throw problem("单段反复次数需要在 2–16 遍之间，请先减少「\(text)」")
                 }
@@ -307,6 +379,7 @@ enum IRealImport {
         }
 
         mutating func chord() throws {
+            ignoreLayoutSpace = false
             guard repeatPrevious == nil else { throw problem("小节重复符不能和其他和弦放在同一小节") }
             let start = index
             index += 1
@@ -378,6 +451,15 @@ enum IRealImport {
             return converted
         }
 
+        mutating func finishJump() throws {
+            guard let pendingJump else { return }
+            guard let first = pendingJumpBar, bars.count > first else { throw problem("跳转指令所在小节没有和弦") }
+            guard bars[bars.count - 1].navigation.jump == nil else { throw problem("同一结束线包含多个跳转指令") }
+            bars[bars.count - 1].navigation.jump = pendingJump
+            self.pendingJump = nil
+            pendingJumpBar = nil
+        }
+
         mutating func closeBar() throws {
             if let remainder = twoBarRemainder {
                 guard events.isEmpty && repeatPrevious == nil else { throw problem("双小节重复符 r 的第二小节必须留空") }
@@ -404,41 +486,10 @@ enum IRealImport {
                 slots = 0
                 return
             }
+            bars[bars.count - 1].navigation = navigation
+            navigation = IRealNavigation.Mark()
             events = []; slots = 0; repeatPrevious = nil
             sectionStart = false; repeatStart = false; ending = nil
-        }
-
-        func expandRepeats() throws -> [Bar] {
-            struct Frame { var start: Int; var firstEnding: Int? }
-            var frames: [Frame] = []
-            var output: [Bar] = []
-            var expectSecondEnding = false
-            for bar in bars {
-                if bar.repeatStart { frames.append(Frame(start: output.count, firstEnding: nil)) }
-                if bar.ending == 1 {
-                    if frames.isEmpty { frames.append(Frame(start: 0, firstEnding: nil)) }
-                    guard frames[frames.count - 1].firstEnding == nil else { throw problem("同一反复段有多个第一结尾") }
-                    frames[frames.count - 1].firstEnding = output.count
-                }
-                if bar.ending == 2 {
-                    guard expectSecondEnding else { throw problem("第二结尾前没有对应的第一结尾和反复结束符") }
-                    expectSecondEnding = false
-                } else if expectSecondEnding { throw problem("第一结尾反复后没有紧接第二结尾") }
-                output.append(bar)
-                if let count = bar.repeatEnd {
-                    let frame = frames.popLast() ?? Frame(start: 0, firstEnding: nil)
-                    guard frame.start < output.count else { throw problem("反复段没有小节") }
-                    if frame.firstEnding != nil && count != 2 { throw problem("编号结尾与多次反复混用，请先在原谱中展开") }
-                    var repeated = Array(output[frame.start..<(frame.firstEnding ?? output.count)])
-                    if !repeated.isEmpty { repeated[0].sectionStart = true }
-                    guard output.count + repeated.count * (count - 1) <= 4_096 else { throw problem("展开反复后超过 4096 小节，请减少反复次数") }
-                    for _ in 1..<count { output += repeated }
-                    expectSecondEnding = frame.firstEnding != nil
-                }
-            }
-            guard frames.isEmpty else { throw problem("反复开始符 { 缺少对应的结束符 }") }
-            guard !expectSecondEnding else { throw problem("第一结尾后缺少第二结尾") }
-            return output
         }
 
         func render(_ bar: Bar) -> String {

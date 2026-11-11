@@ -43,6 +43,7 @@ struct IRealImportView: View {
                         let section = song.sections[index]
                         VStack(alignment: .leading, spacing: 4) {
                             Text("\(section.name) · \(section.bars.count) 小节").font(.subheadline.bold())
+                            if let detail = section.detail { Text(detail).font(.caption).foregroundStyle(.secondary) }
                             Text(section.bars.joined(separator: "  |  "))
                                 .font(.system(size: 12, design: .monospaced))
                                 .textSelection(.enabled)
@@ -67,7 +68,7 @@ struct IRealImportView: View {
             } else {
                 Text("伴奏风格 · \(style?.name ?? "请先导入风格曲库")").font(.subheadline)
             }
-            Text("共 \(song.sections.reduce(0) { $0 + $1.bars.count }) 小节 · 载入后可编辑和弦，按 ⌘Z 恢复原编曲。")
+            Text("共 \(song.sections.count) 个段落、\(song.sections.reduce(0) { $0 + $1.bars.count }) 小节 · 可继续编辑，按 ⌘Z 恢复原编曲。")
                 .font(.caption).foregroundStyle(.secondary)
             if let importError { Text(importError).font(.callout).foregroundStyle(.red) }
             HStack {
