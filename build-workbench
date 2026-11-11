@@ -1,0 +1,91 @@
+#!/bin/sh
+set -eu
+
+folder=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+sources="$folder/Sources"
+build=$(mktemp -d "${TMPDIR:-/tmp}/genos2-workbench.XXXXXXXX")
+app="$folder/伴奏工作台.app"
+staging="$build/伴奏工作台.app"
+icon="$folder/AppIcon/Workbench.icns"
+mode=${1:-}
+mount="$build/volume"
+mounted=
+cleanup() {
+    if [ -n "$mounted" ]; then
+        hdiutil detach "$mount" -quiet || return
+    fi
+    rm -rf "$build"
+}
+trap cleanup EXIT
+
+if [ "$mode" = "--refresh-icon" ]; then
+    ditto "$app" "$staging"
+else
+    . "$folder/style-library.sh"
+    target="$(uname -m)-apple-macosx14.0"
+    mkdir -p "$staging/Contents/MacOS" "$staging/Contents/Resources"
+    swiftc -O -target "$target" -module-cache-path "$build/modules" -emit-library -static -emit-module \
+        -module-name SXCore "$sources"/SXCore/*.swift -o "$build/libSXCore.a"
+    swiftc -O -target "$target" -module-cache-path "$build/modules" -I "$build" -L "$build" -lSXCore \
+        "$sources/SXAudio/YamahaVoices.swift" "$folder/Arrangement.swift" "$folder"/Workbench/*.swift \
+        -o "$staging/Contents/MacOS/GenosWorkbench"
+    cat > "$staging/Contents/Info.plist" <<'PLIST'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleIdentifier</key><string>com.local.genos2.workbench</string>
+    <key>CFBundleExecutable</key><string>GenosWorkbench</string>
+    <key>CFBundleName</key><string>伴奏工作台</string>
+    <key>CFBundleDisplayName</key><string>伴奏工作台</string>
+    <key>CFBundlePackageType</key><string>APPL</string>
+    <key>CFBundleShortVersionString</key><string>1.2</string>
+    <key>CFBundleVersion</key><string>4</string>
+    <key>CFBundleDevelopmentRegion</key><string>zh-Hans</string>
+    <key>CFBundleLocalizations</key><array><string>zh-Hans</string></array>
+    <key>CFBundleIconFile</key><string>Workbench.icns</string>
+    <key>LSMinimumSystemVersion</key><string>14.0</string>
+    <key>NSHighResolutionCapable</key><true/>
+</dict>
+</plist>
+PLIST
+    ditto "$style_library" "$staging/Contents/Resources/Genos2"
+    cp "$folder/Workbench/StyleNames.zh-Hans.tsv" "$staging/Contents/Resources/"
+    ditto "$folder/Workbench/zh-Hans.lproj" "$staging/Contents/Resources/zh-Hans.lproj"
+    ditto "$folder/Workbench/GuitarPro" "$staging/Contents/Resources/GuitarPro"
+fi
+
+cp "$icon" "$staging/Contents/Resources/Workbench.icns"
+plist="$staging/Contents/Info.plist"
+plutil -replace CFBundleIconFile -string Workbench.icns "$plist" 2>/dev/null ||
+    plutil -insert CFBundleIconFile -string Workbench.icns "$plist"
+codesign --force --sign - "$staging"
+codesign --verify --strict "$staging"
+
+if [ "$mode" = "--dmg" ] || [ "$mode" = "--refresh-icon" ]; then
+    image="$build/image"
+    mkdir "$image" "$mount"
+    ditto "$staging" "$image/伴奏工作台.app"
+    ln -s /Applications "$image/Applications"
+    cp "$icon" "$image/.VolumeIcon.icns"
+    hdiutil create -quiet -format UDRW -fs HFS+ -volname "Genos2 伴奏工作台" \
+        -srcfolder "$image" "$build/writable.dmg"
+    hdiutil attach -quiet -noautoopen -nobrowse -mountpoint "$mount" "$build/writable.dmg"
+    mounted=yes
+    xcrun SetFile -a C "$mount"
+    hdiutil detach "$mount" -quiet
+    mounted=
+    hdiutil convert -quiet -format UDZO -o "$build/Genos2-Workbench.dmg" "$build/writable.dmg"
+    hdiutil verify -quiet "$build/Genos2-Workbench.dmg"
+    swift -module-cache-path "$build/modules" "$folder/AppIcon/SetFileIcon.swift" \
+        "$icon" "$build/Genos2-Workbench.dmg"
+    mv -f "$build/Genos2-Workbench.dmg" "$folder/Genos2-Workbench.dmg"
+    printf '%s\n' "$folder/Genos2-Workbench.dmg"
+fi
+
+if [ -d "$app" ]; then mv "$app" "$build/previous.app"; fi
+if ! mv "$staging" "$app"; then
+    if [ -d "$build/previous.app" ]; then mv "$build/previous.app" "$app"; fi
+    exit 1
+fi
+printf '%s\n' "$app"

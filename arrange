@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+
+folder=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+sources="$folder/Sources"
+. "$folder/style-library.sh"
+
+build=$(mktemp -d "${TMPDIR:-/tmp}/genos2-arrange.XXXXXXXX")
+trap 'rm -rf "$build"' EXIT
+swiftc -O -module-cache-path "$build/modules" -emit-library -static -emit-module \
+    -module-name SXCore "$sources"/SXCore/*.swift -o "$build/libSXCore.a"
+swiftc -O -module-cache-path "$build/modules" -I "$build" -L "$build" -lSXCore \
+    "$sources/SXAudio/YamahaVoices.swift" "$folder/Arrangement.swift" "$folder/main.swift" -o "$build/genos2-arrange"
+"$build/genos2-arrange" "$style_library" "$@"

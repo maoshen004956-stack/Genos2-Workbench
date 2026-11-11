@@ -1,0 +1,800 @@
+ballroom/BarnDance.T558.prs	乡村舞会
+ballroom/BarnDanceCombo.T558.prs	乡村舞会小乐队
+ballroom/Beguine.T558.prs	比金舞曲
+ballroom/Cha-Cha.T558.prs	恰恰
+ballroom/Cha-ChaCombo.T558.prs	恰恰小乐队
+ballroom/Charleston.T558.sst	查尔斯顿舞
+ballroom/DreamyWaltz.T558.prs	梦幻华尔兹
+ballroom/EnglishWaltz.T558.prs	英式华尔兹
+ballroom/FinalWaltz.T558.prs	终曲华尔兹
+ballroom/Foxtrot.T558.prs	狐步舞
+ballroom/FoxtrotCombo.T558.prs	狐步舞小乐队
+ballroom/Jive1.T558.prs	捷舞 1
+ballroom/Jive2.T558.prs	捷舞 2
+ballroom/LoungeRumba.T558.prs	酒廊伦巴
+ballroom/Military2Step.T558.prs	军乐两步舞
+ballroom/Military2StepCombo.T558.prs	军乐两步舞小乐队
+ballroom/OrchestralTango.T558.prs	管弦探戈
+ballroom/OrganCha-Cha.T558.prs	风琴恰恰
+ballroom/OrganQuickstep.T558.prs	风琴快步舞
+ballroom/OrganRumba.T558.prs	风琴伦巴
+ballroom/OrganSamba.T558.sst	风琴桑巴
+ballroom/Pasodoble1.T558.prs	斗牛舞 1
+ballroom/Pasodoble2.T558.prs	斗牛舞 2
+ballroom/Quickstep.T558.prs	快步舞
+ballroom/QuickstepCombo.T558.prs	快步舞小乐队
+ballroom/Rumba.T558.prs	伦巴
+ballroom/RumbaCombo.T558.prs	伦巴小乐队
+ballroom/Samba.T558.prs	桑巴
+ballroom/SambaCombo.T558.prs	桑巴小乐队
+ballroom/SlowWaltz.T558.prs	慢华尔兹
+ballroom/StBernardsWaltz.T558.prs	圣伯纳德华尔兹
+ballroom/StBernardsWaltzCombo.T558.prs	圣伯纳德华尔兹小乐队
+ballroom/Tango.T558.prs	探戈
+ballroom/TangoCombo.T558.prs	探戈小乐队
+ballroom/TheaterFoxtrot.T558.prs	剧场狐步舞
+ballroom/TheaterQuickstep.T558.prs	剧场快步舞
+ballroom/VocalFoxtrot.T558.prs	人声狐步舞
+ballroom/VocalWaltz.T558.prs	人声华尔兹
+ballroom/Waltz.T558.prs	华尔兹
+ballroom/WaltzCombo.T558.prs	华尔兹小乐队
+classic-events/6-8March.T560.prs	六八拍进行曲
+classic-events/80sChristmas.T560.prs	80 年代圣诞
+classic-events/AmbientChristmas.T560.fps	氛围圣诞
+classic-events/BaroqueAir.T560.sst	巴洛克咏叹调
+classic-events/ChristmasBallad.T560.prs	圣诞抒情曲
+classic-events/ChristmasSchlager.T560.prs	德语圣诞流行
+classic-events/ChristmasSwing1.T560.prs	圣诞摇摆 1
+classic-events/ChristmasSwing2.T560.prs	圣诞摇摆 2
+classic-events/ChristmasWaltz.T560.prs	圣诞华尔兹
+classic-events/GreenFantasia.T560.prs	绿野幻想曲
+classic-events/Moonlight6-8.T560.prs	六八拍月光曲
+classic-events/OrchPopClassics.T560.prs	经典管弦流行
+classic-events/OrchestralMarch.T560.prs	管弦进行曲
+classic-events/OrchestralPolka.T560.prs	管弦波尔卡
+classic-events/OrganHymn.T560.fps	风琴赞美诗
+classic-events/PromsMarch.T560.prs	逍遥音乐会进行曲
+classic-events/RussianWaltz.T560.prs	俄式华尔兹
+classic-events/US March.T560.prs	美式进行曲
+classic-events/US Polka.T560.prs	美式波尔卡
+classic-events/VienneseWaltz.T560.prs	维也纳华尔兹
+country/60sCountryPop.T554.prs	60 年代乡村流行
+country/70sCountryAnthem.T554.prs	70 年代乡村颂歌
+country/70sCountryFolkPop.T554.prs	70 年代乡村民谣流行
+country/70sCountryPop.T554.prs	70 年代乡村流行
+country/AcousticBluegrass.T554.prs	原声蓝草
+country/Bluegrass.T554.prs	蓝草
+country/BluegrassRock.T554.sst	蓝草摇滚
+country/CalifornianCountry.T554.prs	加州乡村
+country/ChartBluegrass.T554.prs	榜单蓝草
+country/ChartCountry.T554.prs	榜单乡村
+country/Country2-4.T554.prs	二四拍乡村
+country/Country8Beat1.T554.prs	八拍乡村 1
+country/Country8Beat2.T554.prs	八拍乡村 2
+country/CountryBallad1.T554.prs	乡村抒情 1
+country/CountryBallad2.T554.sst	乡村抒情 2
+country/CountryBlues.T554.sst	乡村布鲁斯
+country/CountryCircles.T554.prs	乡村循环
+country/CountryFolk8Beat.T554.prs	八拍乡村民谣
+country/CountryFolkBallad.T554.prs	乡村民谣抒情
+country/CountryFolkUpbeat.T554.prs	明快乡村民谣
+country/CountryHits.T554.prs	乡村金曲
+country/CountryPop.T554.prs	乡村流行
+country/CountryPopDuo.T554.prs	乡村流行二重奏
+country/CountryPopRock.T554.prs	乡村流行摇滚
+country/CountryRock.T554.prs	乡村摇滚
+country/CountryShuffle1.T554.prs	乡村摇摆律动 1
+country/CountryShuffle2.T554.prs	乡村摇摆律动 2
+country/CountrySongwriter.T554.prs	乡村唱作
+country/CountryStandard.T554.prs	乡村经典
+country/CountryStar.T554.prs	乡村之星
+country/CountryStrummin'.T554.prs	乡村扫弦
+country/CountrySwing.T554.prs	乡村摇摆
+country/CountrySwingBallad.T554.prs	乡村摇摆抒情
+country/CountryWaltz.T554.prs	乡村华尔兹
+country/EasyCountryBallad.T554.prs	轻柔乡村抒情
+country/EasySouthernPop.T554.prs	南方轻流行
+country/FastCountryBlues.T554.prs	快速乡村布鲁斯
+country/GentleFolkBallad.T554.prs	柔和民谣
+country/MainstreamCowboy.T554.prs	主流牛仔
+country/NashvilleBallad1.T554.prs	纳什维尔抒情 1
+country/NashvilleBallad2.T554.prs	纳什维尔抒情 2
+country/NashvilleBreakPop.T554.prs	纳什维尔切分流行
+country/NashvillePop.T554.prs	纳什维尔流行
+country/NashvilleRock.T554.prs	纳什维尔摇滚
+country/Pickin'Swing.T554.prs	拨弦摇摆
+country/PopBluegrass.T554.prs	流行蓝草
+country/RanchPop.T554.prs	牧场流行
+country/TexasHoedown.T554.prs	得州乡村舞会
+country/Up-tempoCountryShuffle.T554.prs	快速乡村摇摆律动
+country/WesternWaltz.T554.prs	西部华尔兹
+country/WranglerRock.T554.prs	牛仔摇滚
+dance/10sDreamDance.T551.prs	2010 年代梦幻舞曲
+dance/10sElectroPop.T551.prs	2010 年代电子流行
+dance/10sSpainPop.T551.prs	2010 年代西班牙流行
+dance/90sDreamHouse.T551.prs	90 年代梦幻浩室
+dance/90sHouseDance.T551.prs	90 年代浩室舞曲
+dance/BigRoom.T551.prs	大舞台浩室
+dance/ChartEDM.T551.prs	榜单电子舞曲
+dance/ClubDance.T551.prs	俱乐部舞曲
+dance/ClubHouse.T551.prs	俱乐部浩室
+dance/ClubMixDJ.T551.prs	俱乐部混音
+dance/ClubRiddim.T551.prs	俱乐部雷鬼律动
+dance/DanceBeat.T551.prs	舞曲节拍
+dance/DanceFloor.T551.prs	舞池
+dance/DangerDance.T551.prs	危险舞曲
+dance/DirtyPop.T551.prs	粗粝流行
+dance/EDM Anthem.T551.prs	电子舞曲颂歌
+dance/ElectroHouse.T551.prs	电音浩室
+dance/ElectroPop.T551.prs	电子流行
+dance/Electronica.T551.prs	电子音乐
+dance/EuroTrance.T551.prs	欧洲迷幻舞曲
+dance/Folktronica.T551.prs	电子民谣
+dance/FrenchClub.T551.prs	法式俱乐部舞曲
+dance/FrenchDJ.T551.prs	法式混音舞曲
+dance/FunkyHouse.T551.prs	放克浩室
+dance/GlobalDJs.T551.prs	环球混音舞曲
+dance/HardClub.T551.prs	硬派俱乐部舞曲
+dance/HardTrance.T551.prs	硬派迷幻舞曲
+dance/HipHop.T551.prs	嘻哈
+dance/Ibiza2010.T551.prs	2010 伊维萨舞曲
+dance/JumpDance.T551.prs	跳跃舞曲
+dance/MinimalElectro.T551.prs	极简电子
+dance/ModernHipHop.T551.prs	现代嘻哈
+dance/NatureHipHop.T551.prs	自然嘻哈
+dance/Reggaeton.T551.prs	雷鬼顿
+dance/ReggaetonDJ.T551.prs	雷鬼顿混音
+dance/ReggaetonGroove.T551.prs	雷鬼顿律动
+dance/RetroDance.T551.prs	复古舞曲
+dance/RockYaBeatbox.T551.prs	摇滚口技节拍
+dance/SingItDisco.T551.prs	迪斯科欢唱
+dance/Slow'n'Swingin'.T551.prs	慢速摇摆舞曲
+dance/StreetBeatbox.T551.prs	街头口技节拍
+dance/SynthElectro.T551.prs	合成器电音
+dance/US ElectroPop.T547.prs	美式电子流行
+easylistening/40sSwingBallad.T556.prs	40 年代摇摆抒情
+easylistening/50sPopSwing.T556.prs	50 年代流行摇摆
+easylistening/60sEasyPop.T556.prs	60 年代轻流行
+easylistening/60sOrchestralSwing.T556.prs	60 年代管弦摇摆
+easylistening/70sChartBallad.T556.prs	70 年代榜单抒情
+easylistening/70sEasyPop.T556.prs	70 年代轻流行
+easylistening/70sPianoPopBallad.T556.prs	70 年代钢琴流行抒情
+easylistening/70sPopDuo1.T556.prs	70 年代流行二重奏 1
+easylistening/70sPopDuo2.T556.prs	70 年代流行二重奏 2
+easylistening/8BeatAdria.T556.prs	亚得里亚八拍
+easylistening/AngelSun.T556.prs	阳光天使
+easylistening/ChillPerformer.T556.prs	慵懒演奏
+easylistening/CloudyBay.T556.prs	云湾
+easylistening/DreamyBallad.T556.prs	梦幻抒情
+easylistening/Easy60sBandLeaderPop.T556.prs	60 年代领班轻流行
+easylistening/EasyBallad.T556.prs	轻柔抒情
+easylistening/EasyListening.T556.prs	轻音乐
+easylistening/EasyOrchestra.T556.prs	轻管弦乐
+easylistening/EasyPop.T556.prs	轻流行
+easylistening/EasySwing.T556.prs	轻摇摆
+easylistening/EasyTijuana.T556.prs	轻柔蒂华纳
+easylistening/ElecOrganBallad.T556.fps	电子风琴抒情
+easylistening/EpicBallad.T556.prs	史诗抒情
+easylistening/EuroPopOrgan.T556.prs	欧陆流行风琴
+easylistening/Hawaiian.T556.prs	夏威夷
+easylistening/HawaiianWaltz.T556.prs	夏威夷华尔兹
+easylistening/JollyBeat.T556.sst	欢快节拍
+easylistening/LushBallad.T556.prs	华丽抒情
+easylistening/MOR Waltz.T556.prs	大众轻乐华尔兹
+easylistening/MidnightSwing.T556.prs	午夜摇摆
+easylistening/NightWalk.T556.prs	夜行
+easylistening/Orchestral12-8.T556.prs	十二八拍管弦乐
+easylistening/Orchestral6-8.T556.prs	六八拍管弦乐
+easylistening/OrchestralSwing1.T556.prs	管弦摇摆 1
+easylistening/OrchestralSwing2.T556.prs	管弦摇摆 2
+easylistening/OrganBossa1.T556.prs	风琴波萨诺瓦 1
+easylistening/OrganBossa2.T556.prs	风琴波萨诺瓦 2
+easylistening/OrganSwing.T556.prs	风琴摇摆
+easylistening/PartyA Gogo.T556.prs	派对摇摆舞
+easylistening/Play4Sofa.T556.sst	沙发轻奏
+easylistening/RomanticWaltz.T556.prs	浪漫华尔兹
+easylistening/StandardPianoBallad.T556.prs	标准钢琴抒情
+easylistening/TheaterOrganBallad.T556.fps	剧场风琴抒情
+easylistening/Tijuana.T556.prs	蒂华纳
+easylistening/WonderWaltz.T556.prs	奇妙华尔兹
+entertainer/10sSchlagerDance.T553.prs	2010 年代德语流行舞曲
+entertainer/10sSchlagerFox.T553.prs	2010 年代德语流行狐步
+entertainer/10sSchlagerPop.T553.prs	2010 年代德语流行
+entertainer/10sSchlagerRock.T553.prs	2010 年代德语流行摇滚
+entertainer/20sDanceSchlager.T553.prs	2020 年代德语流行舞曲
+entertainer/20sFoxBeat.T553.prs	2020 年代狐步节拍
+entertainer/6-8Schlager.T553.prs	六八拍德语流行
+entertainer/70sDiscoHits.T553.prs	70 年代迪斯科金曲
+entertainer/70sOrchestralRock.T553.sst	70 年代管弦摇滚
+entertainer/80sDiscoFox.T553.prs	80 年代迪斯科狐步
+entertainer/80sGermanBeat.T553.prs	80 年代德国节拍
+entertainer/80sItalianEvergreen.T553.prs	80 年代意大利常青曲
+entertainer/80sKneipenhit.T553.prs	80 年代酒馆金曲
+entertainer/80sRemixed.T553.prs	80 年代混音
+entertainer/90sGermanPartyPop.T553.prs	90 年代德国派对流行
+entertainer/90sGermanRock.T553.prs	90 年代德国摇滚
+entertainer/AkkordeonPolka.T553.sst	手风琴波尔卡
+entertainer/AlpenBallad1.T553.prs	阿尔卑斯抒情 1
+entertainer/AlpenBallad2.T553.prs	阿尔卑斯抒情 2
+entertainer/AlpenSchlager.T553.prs	阿尔卑斯德语流行
+entertainer/ApresSkiHit.T553.prs	滑雪派对金曲
+entertainer/ApresSkiParty.T553.prs	滑雪派对
+entertainer/ClassicSchlagerBallad.T553.prs	经典德语流行抒情
+entertainer/ColorDance.T553.prs	缤纷舞曲
+entertainer/DanceFox2016.T553.prs	2016 舞厅狐步
+entertainer/DanishShuffle.T553.prs	丹麦摇摆律动
+entertainer/DanishSlowBeat.T553.prs	丹麦慢节拍
+entertainer/DiscoFoxKing.T553.prs	迪斯科狐步之王
+entertainer/DiscoFoxRock.T553.prs	迪斯科狐步摇滚
+entertainer/DreamFox.T553.prs	梦幻狐步
+entertainer/DreamSchlager.T553.prs	梦幻德语流行
+entertainer/GentlemanSchlager.T553.prs	绅士德语流行
+entertainer/HelloShuffle.T553.prs	问候摇摆律动
+entertainer/IslandMegaHammer.T553.prs	海岛热门舞曲
+entertainer/KarnevalBand.T553.prs	狂欢乐队
+entertainer/KarnevalBeat.T553.prs	狂欢节拍
+entertainer/KarnevalPolka.T553.prs	狂欢波尔卡
+entertainer/KuschelSchlager.T553.prs	温柔德语流行
+entertainer/MallorcaParty.T553.prs	马略卡派对
+entertainer/MallorcaShuffleParty.T553.prs	马略卡摇摆派对
+entertainer/MegaFox.T553.prs	劲爆狐步
+entertainer/MegaHit.T553.prs	超级金曲
+entertainer/ModernSchlager.T553.prs	现代德语流行
+entertainer/OktoberRockHit.T553.prs	十月节摇滚
+entertainer/OldiesEuroPop.T553.prs	怀旧欧陆流行
+entertainer/OldiesSchlagerPolka.T553.prs	怀旧德语流行波尔卡
+entertainer/PartyKrainer.T553.prs	克赖纳派对
+entertainer/PartyPolka.T553.prs	派对波尔卡
+entertainer/PolkaPop.T553.prs	流行波尔卡
+entertainer/PopRumba.T553.prs	流行伦巴
+entertainer/RainbowPop.T553.prs	彩虹流行
+entertainer/ReggaetonSchlager.T553.prs	雷鬼顿德语流行
+entertainer/RockPartyKing.T553.prs	摇滚派对之王
+entertainer/Scand80sBeat.T553.prs	80 年代北欧节拍
+entertainer/Scand8Beat1.T553.prs	北欧八拍 1
+entertainer/Scand8Beat2.T553.prs	北欧八拍 2
+entertainer/ScandBugg.T553.prs	北欧布格舞
+entertainer/ScandCountry.T553.prs	北欧乡村
+entertainer/ScandMarch.T553.prs	北欧进行曲
+entertainer/ScandMedShuffle.T553.prs	北欧中速摇摆律动
+entertainer/ScandShuffle.T553.prs	北欧摇摆律动
+entertainer/ScandSlowRock.T553.prs	北欧慢摇滚
+entertainer/ScandWaltz.T553.prs	北欧华尔兹
+entertainer/Schlager3-4.T553.prs	三四拍德语流行
+entertainer/SchlagerAlp.T553.prs	山地德语流行
+entertainer/SchlagerBallad.T553.prs	德语流行抒情
+entertainer/SchlagerBeat.T553.prs	德语流行节拍
+entertainer/SchlagerBoom.T553.prs	热门德语流行
+entertainer/SchlagerDisco.T553.prs	德语流行迪斯科
+entertainer/SchlagerFever.T553.prs	狂热德语流行
+entertainer/SchlagerFox.T553.prs	德语流行狐步
+entertainer/SchlagerLatin.T553.prs	拉丁德语流行
+entertainer/SchlagerOldieDuo.T553.prs	怀旧德语流行二重奏
+entertainer/SchlagerPolka.T553.prs	德语流行波尔卡
+entertainer/SchlagerPop.T553.prs	德语流行金曲
+entertainer/SchlagerReggae.T553.prs	雷鬼德语流行
+entertainer/SchlagerRemix.T553.sst	德语流行混音
+entertainer/SchlagerRocker.T553.prs	德语流行摇滚
+entertainer/SchlagerSamba.T553.prs	德语流行桑巴
+entertainer/SchlagerShuffle.T553.prs	德语流行摇摆律动
+entertainer/SchlagerSoul.T553.prs	灵魂德语流行
+entertainer/SchlagerWaltz.T553.prs	德语流行华尔兹
+entertainer/SolidMedSchlager.T553.prs	中速德语流行
+entertainer/SwingSchlager.T553.prs	德语流行摇摆
+entertainer/SwissSchlager.T553.prs	瑞士德语流行
+entertainer/SynthPopDuo.T553.prs	合成器流行二重奏
+entertainer/TeenRockPopSchlager.T553.prs	青春德语流行摇滚
+entertainer/TropicalHouseSchlager.T553.prs	热带浩室德语流行
+entertainer/VolksDance.T553.prs	民俗舞曲
+entertainer/VolksSchlager.T553.sst	民俗德语流行
+jazz/40sBandLeaderSwing.T555.prs	40 年代领班摇摆
+jazz/50sBigBandSwing.T555.prs	50 年代大乐队摇摆
+jazz/60sSierraSwing.T555.prs	60 年代塞拉摇摆
+jazz/AcousticJazz.T555.prs	原声爵士
+jazz/AfroCuban.T555.prs	非裔古巴爵士
+jazz/BigBandBallad.T555.prs	大乐队抒情
+jazz/BigBandBlues.T555.prs	大乐队布鲁斯
+jazz/BigBandCrooner.T555.sst	大乐队低吟
+jazz/BigBandFast1.T555.prs	快速大乐队 1
+jazz/BigBandFast2.T555.prs	快速大乐队 2
+jazz/BigBandJazz.T555.sst	大乐队爵士
+jazz/BigBandMedium.T555.prs	中速大乐队
+jazz/BigBandShuffle.T555.sst	大乐队摇摆律动
+jazz/BigBandSwing.T555.prs	大乐队摇摆
+jazz/BigBandUp-tempo.T555.sst	高速大乐队
+jazz/CitySingersSwing.T555.sst	都会歌手摇摆
+jazz/ClassicBigBand.T555.prs	经典大乐队
+jazz/CoolJazzBallad.T555.prs	冷爵士抒情
+jazz/CoolJazzClub.T555.prs	冷爵士俱乐部
+jazz/CoolPianoJazz.T555.sst	冷爵士钢琴
+jazz/Dixieland.T555.prs	迪克西兰爵士
+jazz/DrawbarGroove.T555.prs	拉杆风琴律动
+jazz/DrawbarSwing.T555.sst	拉杆风琴摇摆
+jazz/ElectroSwing.T555.prs	电子摇摆
+jazz/FiveFour.T555.prs	五四拍爵士
+jazz/FrenchJazz.T555.prs	法式爵士
+jazz/InstrumentalJazz.T555.sst	器乐爵士
+jazz/JazzGuitarClub.T555.sst	爵士吉他俱乐部
+jazz/JazzOrganBallad.T555.prs	爵士风琴抒情
+jazz/JazzOrganCombo.T555.sst	爵士风琴小乐队
+jazz/JazzOrganGrinder.T555.sst	爵士手摇风琴
+jazz/JazzQuartet.T555.prs	爵士四重奏
+jazz/MediumJazzWaltz.T555.sst	中速爵士华尔兹
+jazz/ModernBigBand.T555.prs	现代大乐队
+jazz/OrchBigBand1.T555.prs	管弦大乐队 1
+jazz/OrchBigBand2.T555.prs	管弦大乐队 2
+jazz/Ragtime.T555.prs	拉格泰姆
+jazz/SaloonPiano.T555.prs	酒馆钢琴
+jazz/SlowJazzWaltz.T555.prs	慢速爵士华尔兹
+jazz/Smokin'BigBand.T555.sst	火热大乐队
+jazz/Swingin'BigBand.T555.sst	摇摆大乐队
+jazz/Swingin'Orchestra.T555.prs	摇摆管弦乐
+jazz/TradPianoBallad.T555.prs	传统钢琴抒情
+jazz/TradPianoJazz.T555.prs	传统爵士钢琴
+jazz/UkuleleSwing.T555.prs	尤克里里摇摆
+jazz/Up-tempoSwing.T555.sst	快速摇摆
+latin/10sCubanPop.T557.prs	2010 年代古巴流行
+latin/80sBrazilianPop.T557.prs	80 年代巴西流行
+latin/Bachata.T557.prs	巴恰塔
+latin/BoleroLento.T557.prs	慢速波莱罗
+latin/Bomba.T557.prs	邦巴
+latin/BossaBrazil.T557.prs	巴西波萨
+latin/BossaFast.T557.prs	快速波萨
+latin/BossaNova.T557.prs	波萨诺瓦
+latin/BossaRio.T557.prs	里约波萨
+latin/ColombianPop.T557.prs	哥伦比亚流行
+latin/CubanCha-Cha.T557.prs	古巴恰恰
+latin/CubanSon.T557.sst	古巴颂乐
+latin/EuroPopMambo.T557.prs	欧陆流行曼波
+latin/Guaguanco.T557.sst	瓜瓜恩科
+latin/Guajira.T557.prs	瓜希拉
+latin/GuitarRumba.T557.prs	吉他伦巴
+latin/JazzSamba.T557.prs	爵士桑巴
+latin/LatinPop.T557.prs	拉丁流行
+latin/LatinSoul.T557.prs	拉丁灵魂乐
+latin/LiveCumbia.T557.prs	现场昆比亚
+latin/LiveMerengue.T557.prs	现场梅伦格
+latin/LoungeBossa.T557.prs	酒廊波萨
+latin/PopBachata.T557.prs	流行巴恰塔
+latin/PopBossa.T557.prs	流行波萨
+latin/PopCha-Cha.T557.prs	流行恰恰
+latin/PopCumbia.T557.prs	流行昆比亚
+latin/PopFlamencos.T557.sst	流行弗拉门戈
+latin/PopLatin.T557.prs	流行拉丁
+latin/PopLatinBallad.T557.prs	拉丁流行抒情
+latin/PopMerengue.T557.prs	流行梅伦格
+latin/ReggaetonPop.T557.prs	流行雷鬼顿
+latin/RockCha-Cha.T557.prs	摇滚恰恰
+latin/RumbaBolero.T557.prs	伦巴波莱罗
+latin/RumbaFlamenco.T557.prs	弗拉门戈伦巴
+latin/RumbaIsland.T557.prs	海岛伦巴
+latin/Salsa.T557.sst	萨尔萨
+latin/SalsaGranCiclon.T557.prs	旋风萨尔萨
+latin/Samba60s.T557.prs	60 年代桑巴
+latin/SambaFast.T557.prs	快速桑巴
+latin/SambaRio.T557.prs	里约桑巴
+latin/SlowBossa.T557.prs	慢速波萨
+latin/SmoothLatinBallad.T557.prs	柔和拉丁抒情
+latin/SpanishRumba.T557.prs	西班牙伦巴
+latin/SteelBandSoca.T557.prs	钢鼓索卡
+latin/TangoFlamencos.T557.prs	弗拉门戈探戈
+movie-show/6-8RomanticRock.T559.prs	六八拍浪漫摇滚
+movie-show/60sCrimeCaper.T559.prs	60 年代犯罪喜剧
+movie-show/70sTV Adventure.T559.prs	70 年代电视冒险
+movie-show/70sTV Theme.T559.prs	70 年代电视主题
+movie-show/70sTeensMusical.T559.prs	70 年代青春音乐剧
+movie-show/80sAllTimePop.T559.prs	80 年代经典流行
+movie-show/80sMovieBallad.T559.prs	80 年代电影抒情
+movie-show/80sMusicalBallad.T559.prs	80 年代音乐剧抒情
+movie-show/ActionAnthem.T559.prs	动作片颂歌
+movie-show/AnimationBallad.T559.prs	动画抒情
+movie-show/AnimationFantasy.T559.prs	奇幻动画
+movie-show/BlockbusterBallad.T559.prs	大片抒情
+movie-show/BoxingLegend.T559.prs	拳击传奇
+movie-show/BroadwayBallad.T559.prs	百老汇抒情
+movie-show/BroadwayProduction.T559.prs	百老汇大制作
+movie-show/ChoirSoundtrack.T559.prs	合唱配乐
+movie-show/CrimeComedyRomp.T559.prs	犯罪喜剧狂想
+movie-show/CultKidsTV.T559.prs	经典儿童电视
+movie-show/DesertAdventure.T559.prs	沙漠冒险
+movie-show/DiscoDrama.T559.prs	迪斯科戏剧
+movie-show/EpicDramaBallad.T559.prs	史诗剧情抒情
+movie-show/EtherealMovie.T559.fps	空灵电影
+movie-show/EtherealVoices.T559.fps	空灵人声
+movie-show/GuitarSerenade.T559.prs	吉他小夜曲
+movie-show/Gunslinger.T559.prs	西部枪手
+movie-show/IcyBallad.T559.prs	冰雪抒情
+movie-show/It'sShowtime.T559.prs	演出开始
+movie-show/MovieBallad.T559.sst	电影抒情
+movie-show/MovieClassic.T559.prs	经典电影
+movie-show/MovieDisco.T559.prs	电影迪斯科
+movie-show/MovieHorns.T559.fps	电影铜管
+movie-show/MovieMystery.T559.prs	悬疑电影
+movie-show/MovieSoundtrack.T559.prs	电影配乐
+movie-show/MovieSwing1.T559.prs	电影摇摆 1
+movie-show/MovieSwing2.T559.prs	电影摇摆 2
+movie-show/MusicalTheaterBallad.T559.prs	音乐剧抒情
+movie-show/OnBroadway.T559.fps	百老汇舞台
+movie-show/OrchestralSoftRock.T559.prs	管弦软摇滚
+movie-show/PopMusical.T559.prs	流行音乐剧
+movie-show/RomanticMovie.T559.fps	浪漫电影
+movie-show/Sci-FiMarch.T559.prs	科幻进行曲
+movie-show/SecretService.T559.prs	特勤局
+movie-show/TV Blockbuster.T559.prs	热门电视剧
+movie-show/TapDanceSwing.T559.prs	踢踏摇摆
+movie-show/TheaterShowtime.T559.prs	剧场开演
+movie-show/WildWest.T559.prs	狂野西部
+oldies/3-4ChartWaltz.T550.prs	三四拍榜单华尔兹
+oldies/50sFloorFillerPop.T550.prs	50 年代舞池流行
+oldies/50sRock&Roll.T550.prs	50 年代早期摇滚
+oldies/60s8Beat.T550.prs	60 年代八拍
+oldies/60sBigHit.T550.prs	60 年代畅销金曲
+oldies/60sBlueEyedSoul.T550.prs	60 年代蓝眼灵魂乐
+oldies/60sBritishSoul.T550.prs	60 年代英国灵魂乐
+oldies/60sChartSwing.T550.prs	60 年代榜单摇摆
+oldies/60sCheekyPop.T550.prs	60 年代俏皮流行
+oldies/60sFolkPop.T550.prs	60 年代民谣流行
+oldies/60sFolkRock.T550.prs	60 年代民谣摇滚
+oldies/60sGuitarRock.T550.prs	60 年代吉他摇滚
+oldies/60sInstrumentalPop.T550.prs	60 年代器乐流行
+oldies/60sLoveAffairSwing.T550.prs	60 年代恋曲摇摆
+oldies/60sMancPop.T550.prs	60 年代曼彻斯特流行
+oldies/60sOrganBallad.T550.prs	60 年代风琴抒情
+oldies/60sPianoPop.T550.prs	60 年代钢琴流行
+oldies/60sPopBallad.T550.prs	60 年代流行抒情
+oldies/60sPopRock.T550.prs	60 年代流行摇滚
+oldies/60sRhythm&Blues.T550.prs	60 年代节奏布鲁斯
+oldies/60sRock&Roll.T550.prs	60 年代早期摇滚
+oldies/60sRussianFolk.T550.prs	60 年代俄罗斯民谣
+oldies/60sSignaturePop.T550.prs	60 年代代表流行
+oldies/60sSoftBritPop.T550.prs	60 年代柔和英伦流行
+oldies/60sSunshinePop.T550.prs	60 年代阳光流行
+oldies/60sSuperGroup.T550.prs	60 年代超级乐队
+oldies/60sUS KingPop.T550.prs	60 年代美国流行天王
+oldies/60sUS R&R.T550.prs	60 年代美式摇滚
+oldies/60sUnderground.T550.prs	60 年代地下音乐
+oldies/60sVintageCha-Cha.T550.prs	60 年代复古恰恰
+oldies/60sVintagePop.T550.prs	60 年代复古流行
+oldies/60sVintageRumba.T550.prs	60 年代复古伦巴
+oldies/BeachRock.T550.sst	海滩摇滚
+oldies/BoogieWoogie.T550.sst	布吉伍吉
+oldies/BubblegumPop.T550.prs	泡泡糖流行
+oldies/CaptainSax6-8.T550.prs	六八拍萨克斯船长
+oldies/FolkSongDuo.T550.prs	民歌二重奏
+oldies/HonkyTonkPop.T550.prs	酒馆流行
+oldies/JangleFolkPop.T550.prs	铃音吉他民谣流行
+oldies/LightBallad.T550.prs	轻柔抒情
+oldies/OldiesRock&Roll.T550.prs	怀旧早期摇滚
+oldies/PianoBoogie.T550.sst	钢琴布吉
+oldies/PubPiano.T550.prs	酒吧钢琴
+oldies/Rock&Roll.T550.sst	早期摇滚
+oldies/Rock&RollJive.T550.sst	摇滚捷舞
+oldies/Rock&RollShuffle.T550.prs	摇滚摇摆律动
+oldies/Rockabilly.T550.sst	山地摇滚
+oldies/SimpleShuffle.T550.prs	简单摇摆律动
+oldies/SingalongDanceBand.T550.prs	合唱舞厅乐队
+oldies/SingalongPiano.T550.prs	钢琴合唱
+oldies/Skiffle.T550.sst	斯基弗尔民谣
+oldies/SurfRock.T550.prs	冲浪摇滚
+oldies/Sweet60sPop.T550.prs	甜美 60 年代流行
+oldies/Swingin'Jive.T550.prs	摇摆捷舞
+oldies/Swinging60s.T550.prs	摇摆 60 年代
+oldies/Twist.T550.sst	扭摆舞
+oldies/VintageGuitarPop.T550.prs	复古吉他流行
+pop/00sBluesyBallad.T547.prs	2000 年代布鲁斯抒情
+pop/00sBoyBand.T547.prs	2000 年代男子组合
+pop/00sUS DancePop.T547.prs	2000 年代美国流行舞曲
+pop/10sCanadianPowerPop.T547.prs	2010 年代加拿大强力流行
+pop/10sCzechPop.T547.prs	2010 年代捷克流行
+pop/10sDancePop.T547.prs	2010 年代流行舞曲
+pop/10sMidTempoPop.T547.prs	2010 年代中速流行
+pop/12-8PopBallad.T547.prs	十二八拍流行抒情
+pop/6-8ChartBallad.T547.prs	六八拍榜单抒情
+pop/6-8EuroPopBallad.T547.prs	六八拍欧陆流行抒情
+pop/6-8GuitarBallad.T547.prs	六八拍吉他抒情
+pop/90s8BeatBallad.T547.prs	90 年代八拍抒情
+pop/90sAltBritPop.T547.prs	90 年代另类英伦流行
+pop/90sBritPop.T547.prs	90 年代英伦流行
+pop/90sBritPopBallad.T547.sst	90 年代英伦流行抒情
+pop/90sChartBoyBand.T547.prs	90 年代榜单男子组合
+pop/90sDancePop.T547.prs	90 年代流行舞曲
+pop/90sDisco.T547.prs	90 年代迪斯科
+pop/90sEpicBallad.T547.prs	90 年代史诗抒情
+pop/90sEuroReggae.T547.sst	90 年代欧洲雷鬼
+pop/90sGuitarPop.T547.prs	90 年代吉他流行
+pop/90sMainstream.T547.prs	90 年代主流流行
+pop/90sPopBallad.T547.prs	90 年代流行抒情
+pop/90sPopShuffle.T547.prs	90 年代流行摇摆律动
+pop/90sSundayPop.T547.prs	90 年代周日轻流行
+pop/90sUS ChartBallad.T547.prs	90 年代美国榜单抒情
+pop/90sUS TeenPop.T547.prs	90 年代美国青春流行
+pop/90sUltimateBallad.T547.prs	90 年代经典抒情
+pop/90sUpliftingBallad.T547.prs	90 年代励志抒情
+pop/BoyBandPop.T547.prs	男子组合流行
+pop/BreakoutElectro.T547.prs	破界电音
+pop/BritPopAnthem.T547.prs	英伦流行颂歌
+pop/BritPopDiva.T547.prs	英伦流行女声
+pop/BritPopSwing.T547.prs	英伦流行摇摆
+pop/BritishDancePop.T547.prs	英国流行舞曲
+pop/ChartDancePop.T547.prs	榜单流行舞曲
+pop/ChartPianoShuffle.T547.prs	榜单钢琴摇摆律动
+pop/ChartSynthPop.T547.prs	榜单合成器流行
+pop/Chillout1.T547.prs	驰放音乐 1
+pop/Chillout2.T547.prs	驰放音乐 2
+pop/ChilloutCafe.T547.prs	驰放咖啡馆
+pop/CinematicPop.T547.prs	电影感流行
+pop/ClassicalPop.T547.prs	古典流行
+pop/DancehallPop.T547.prs	舞厅雷鬼流行
+pop/DiscoPopJam.T547.prs	迪斯科流行即兴
+pop/DiscoRevival.T547.sst	复兴迪斯科
+pop/DivaChartPunk.T547.prs	女声榜单朋克
+pop/DivaPowerPop.T547.prs	女声强力流行
+pop/EpicDivaBallad.T547.prs	女声史诗抒情
+pop/EpicEuroBallad.T547.prs	史诗欧陆抒情
+pop/FunkPopRock.T547.prs	放克流行摇滚
+pop/FunkyPop.T547.prs	放克流行
+pop/IrishFolkPop.T547.prs	爱尔兰民谣流行
+pop/IrishPopBallad.T547.prs	爱尔兰流行抒情
+pop/IrishPopRock.T547.prs	爱尔兰流行摇滚
+pop/LoveSong.T547.prs	爱情歌曲
+pop/ModernPopBallad.T547.prs	现代流行抒情
+pop/OrchestralPop.T547.prs	管弦流行
+pop/PassionPop.T547.prs	热情流行
+pop/PopRockShuffle.T547.prs	流行摇滚摇摆律动
+pop/PopTeenShuffle.T547.prs	青春流行摇摆律动
+pop/PowerPopBallad.T547.prs	强力流行抒情
+pop/ReggaetonSlowJam.T547.prs	慢速雷鬼顿即兴
+pop/SkyPop.T547.prs	天空流行
+pop/SongwriterBallad.T547.prs	唱作人抒情
+pop/SoulfulBallad.T547.prs	灵魂抒情
+pop/SweetPop.T547.prs	甜美流行
+pop/ThrowbackPop.T547.prs	复古回潮流行
+pop/UK FolkPop.T547.prs	英国民谣流行
+pop/US BoyBandBallad.T547.prs	美国男子组合抒情
+pop/US ElectroPop.T547.prs	美式电子流行
+pop/US FolkPop.T547.prs	美国民谣流行
+pop/US SingerPop.T547.prs	美国歌手流行
+pop/UkulelePop.T547.prs	尤克里里流行
+pop/UnpluggedBallad.T547.prs	不插电抒情
+pop/UnpluggedPop.T547.prs	不插电流行
+pop/VocalPopBallad.T547.prs	人声流行抒情
+pop/ZoukLove.T547.prs	祖克情歌
+r-b/16BeatSoul.T552.prs	十六拍灵魂乐
+r-b/6-8SoulBallad.T552.prs	六八拍灵魂抒情
+r-b/60sPopR&B.T552.prs	60 年代流行节奏布鲁斯
+r-b/60sSlowSoul.T552.prs	60 年代慢速灵魂乐
+r-b/60sSoul.T552.prs	60 年代灵魂乐
+r-b/70sChartSoul.T552.prs	70 年代榜单灵魂乐
+r-b/70sCoolBallad.T552.prs	70 年代冷调抒情
+r-b/70sScatLegend.T552.sst	70 年代拟声爵士传奇
+r-b/70sSoul.T552.prs	70 年代灵魂乐
+r-b/70sSoulBallad.T552.prs	70 年代灵魂抒情
+r-b/80sFunk.T552.prs	80 年代放克
+r-b/80sGrooveBallad.T552.prs	80 年代律动抒情
+r-b/80sSmoothBallad.T552.prs	80 年代柔滑抒情
+r-b/90sPopGroove.T552.prs	90 年代流行律动
+r-b/90sSmoothBallad.T552.prs	90 年代柔滑抒情
+r-b/AcousticBlues.T552.sst	原声布鲁斯
+r-b/AcousticShuffle.T552.sst	原声摇摆律动
+r-b/AmazingGospel.T552.prs	奇妙福音
+r-b/BlueBlues.T552.prs	深蓝布鲁斯
+r-b/BluesRock.T552.sst	布鲁斯摇滚
+r-b/BluesShuffle.T552.prs	布鲁斯摇摆律动
+r-b/BluesShuffleBand.T552.sst	布鲁斯摇摆律动乐队
+r-b/Classic16Beat.T552.prs	经典十六拍
+r-b/CoolR&B.T552.prs	冷调节奏布鲁斯
+r-b/DetroitPop.T552.prs	底特律流行
+r-b/DetroitSoul.T552.prs	底特律灵魂乐
+r-b/FranklySoul.T552.sst	率真灵魂乐
+r-b/FunkPop.T552.prs	放克流行
+r-b/FunkyShuffle.T552.prs	放克摇摆律动
+r-b/FusionShuffle.T552.prs	融合摇摆律动
+r-b/GospelBallad.T552.prs	福音抒情
+r-b/GospelBrothers.T552.prs	福音兄弟
+r-b/GospelSisters.T552.prs	福音姐妹
+r-b/GospelSwing.T552.sst	福音摇摆
+r-b/GuitarBlues.T552.prs	吉他布鲁斯
+r-b/HollywoodGospel.T552.prs	好莱坞福音
+r-b/JazzFunk.T552.sst	爵士放克
+r-b/JazzFusion.T552.prs	融合爵士
+r-b/JazzGroove.T552.prs	爵士律动
+r-b/KoolShuffle.T552.prs	酷感摇摆律动
+r-b/LiveSoulBand.T552.prs	现场灵魂乐队
+r-b/LovelyShuffle.T552.prs	温柔摇摆律动
+r-b/MotorCity.T552.prs	汽车城律动
+r-b/Mr.Soul.T552.prs	灵魂先生
+r-b/PianoSwingBlues.T552.prs	钢琴摇摆布鲁斯
+r-b/R&B PopDiva.T552.prs	节奏布鲁斯流行女声
+r-b/R&B Shuffle.T552.sst	节奏布鲁斯摇摆律动
+r-b/R&B SlowBallad.T552.prs	节奏布鲁斯慢抒情
+r-b/R&B SoulBallad.T552.sst	节奏布鲁斯灵魂抒情
+r-b/RetroSoul.T552.prs	复古灵魂乐
+r-b/SlowBlues.T552.sst	慢速布鲁斯
+r-b/SlowSoulJam.T552.sst	慢速灵魂即兴
+r-b/Smokin'Soul.T552.prs	火热灵魂乐
+r-b/SoulShuffle.T552.prs	灵魂乐摇摆律动
+r-b/SouthernGospel.T552.sst	南方福音
+r-b/SouthernSoul.T552.prs	南方灵魂乐
+r-b/SuperGroove.T552.sst	超级律动
+r-b/SwingSoul.T552.prs	摇摆灵魂乐
+r-b/TexasBlues.T552.prs	得州布鲁斯
+r-b/TheBlues.T552.prs	经典布鲁斯
+retropop/16BeatBallad.T549.prs	十六拍抒情
+retropop/6-8ClassicSynth.T549.prs	六八拍经典合成器
+retropop/70s8BeatBallad.T549.prs	70 年代八拍抒情
+retropop/70sAcousticFolk.T549.prs	70 年代原声民谣
+retropop/70sBaroquePop.T549.prs	70 年代巴洛克流行
+retropop/70sClassicDisco.T549.prs	70 年代经典迪斯科
+retropop/70sCrossoverPop.T549.prs	70 年代跨界流行
+retropop/70sDisco1.T549.prs	70 年代迪斯科 1
+retropop/70sDisco2.T549.prs	70 年代迪斯科 2
+retropop/70sDiscoDance.T549.prs	70 年代迪斯科舞曲
+retropop/70sDiscoFunk.T549.prs	70 年代迪斯科放克
+retropop/70sDiscotheque.T549.prs	70 年代舞厅迪斯科
+retropop/70sDownTempo.T549.prs	70 年代慢节奏
+retropop/70sEuroDisco.T549.prs	70 年代欧洲迪斯科
+retropop/70sEuroPop.T549.prs	70 年代欧陆流行
+retropop/70sFrenchHit.T549.prs	70 年代法国金曲
+retropop/70sFunkyDisco.T549.prs	70 年代放克迪斯科
+retropop/70sGlamPiano.T549.prs	70 年代华丽钢琴
+retropop/70sPianoShuffle.T549.sst	70 年代钢琴摇摆律动
+retropop/70sPopShuffle.T549.prs	70 年代流行摇摆律动
+retropop/70sRevivalPop.T549.prs	70 年代复兴流行
+retropop/70sRockDisco.T549.prs	70 年代摇滚迪斯科
+retropop/70sSkifflePiano.T549.prs	70 年代斯基弗尔民谣钢琴
+retropop/70sSofaBallad.T549.prs	70 年代沙发抒情
+retropop/70sSuperSoftRock.T549.prs	70 年代超柔软摇滚
+retropop/70sSwedish8Beat.T549.prs	70 年代瑞典八拍
+retropop/70sSwingPiano.T549.prs	70 年代摇摆钢琴
+retropop/70sUS PopDuo.T549.sst	70 年代美国流行二重奏
+retropop/80s6-8DX Ballad.T549.prs	80 年代六八拍数字合成抒情
+retropop/80s8Beat.T549.prs	80 年代八拍
+retropop/80s8BeatBallad.T549.prs	80 年代八拍抒情
+retropop/80sAnalogBallad.T549.prs	80 年代模拟合成抒情
+retropop/80sBoyBand.T549.prs	80 年代男子组合
+retropop/80sBritishPop.T549.prs	80 年代英国流行
+retropop/80sCatchyPop.T549.prs	80 年代洗脑流行
+retropop/80sChilloutSynth.T549.fps	80 年代驰放合成器
+retropop/80sChintzyPop.T549.prs	80 年代花哨流行
+retropop/80sClassic6-8.T549.prs	80 年代经典六八拍
+retropop/80sClubPop.T549.prs	80 年代俱乐部流行
+retropop/80sDX Ballad.T549.prs	80 年代数字合成抒情
+retropop/80sDancePop.T549.prs	80 年代流行舞曲
+retropop/80sElectroBallad.T549.prs	80 年代电子抒情
+retropop/80sEuroFastPop.T549.prs	80 年代快速欧陆流行
+retropop/80sEuroPop.T549.sst	80 年代欧陆流行
+retropop/80sExoticPop.T549.prs	80 年代异域流行
+retropop/80sFunkIcon.T549.prs	80 年代放克偶像
+retropop/80sFunkySoul.T549.prs	80 年代放克灵魂乐
+retropop/80sGuitarPop.T549.prs	80 年代吉他流行
+retropop/80sLoveBallad.T549.prs	80 年代爱情抒情
+retropop/80sLoveSong.T549.prs	80 年代情歌
+retropop/80sMellowPop.T549.prs	80 年代柔和流行
+retropop/80sMonsterHit.T549.prs	80 年代超级金曲
+retropop/80sPianoBallad.T549.prs	80 年代钢琴抒情
+retropop/80sPlatinumBallad.T549.prs	80 年代白金抒情
+retropop/80sPopBallad.T549.prs	80 年代流行抒情
+retropop/80sPopDiva.T549.prs	80 年代流行女声
+retropop/80sPopQueen.T549.prs	80 年代流行天后
+retropop/80sPowerBallad.T549.prs	80 年代强力抒情
+retropop/80sPowerPopBallad.T549.prs	80 年代强力流行抒情
+retropop/80sRetroDisco.T549.prs	80 年代复古迪斯科
+retropop/80sSka.T549.prs	80 年代斯卡
+retropop/80sSuaveBritPop.T549.prs	80 年代优雅英伦流行
+retropop/80sSwedishPopBallad.T549.prs	80 年代瑞典流行抒情
+retropop/80sSynthBallad.T549.prs	80 年代合成器抒情
+retropop/80sSynthDuo.T549.prs	80 年代合成器二重奏
+retropop/80sSynthPop.T549.prs	80 年代合成器流行
+retropop/80sTeenDisco.T549.prs	80 年代青春迪斯科
+retropop/80sUK SynthPop.T549.prs	80 年代英国合成器流行
+retropop/80sUS CityPop.T549.prs	80 年代美国都市流行
+retropop/80sUpliftingBallad.T549.prs	80 年代励志抒情
+retropop/BoyBandBallad.T549.prs	男子组合抒情
+retropop/BritishSunnyPop.T549.prs	英国阳光流行
+retropop/Classic8Beat.T549.prs	经典八拍
+retropop/Cool8Beat.T549.prs	酷感八拍
+retropop/FunkDisco.T549.sst	放克迪斯科
+retropop/GrooveCamp.T549.prs	律动营地
+retropop/LatinPartyPop.T549.prs	拉丁派对流行
+retropop/LightReggae.T549.prs	轻雷鬼
+retropop/PhillyDisco.T549.prs	费城迪斯科
+retropop/PianoPowerBallad.T549.prs	钢琴强力抒情
+retropop/PopLegend.T549.prs	流行传奇
+retropop/PopWaltz.T549.prs	流行华尔兹
+retropop/ReefReggae.T549.prs	珊瑚礁雷鬼
+retropop/SmoothPopBallad.T549.prs	柔滑流行抒情
+retropop/SunnyReggae.T549.prs	阳光雷鬼
+retropop/SwedishEuroDisco.T549.prs	瑞典欧式迪斯科
+retropop/SwedishPopShuffle.T549.prs	瑞典流行摇摆律动
+retropop/SynthPop.T549.prs	合成器流行
+retropop/Up-tempo8Beat.T549.prs	快速八拍
+retropop/WestCoastBeat.T549.prs	西海岸节拍
+rock/10s8BeatRock.T548.prs	2010 年代八拍摇滚
+rock/16BeatRock.T548.prs	十六拍摇滚
+rock/6-8Rock.T548.prs	六八拍摇滚
+rock/60sPsychedelicRock.T548.prs	60 年代迷幻摇滚
+rock/60sRagaRock.T548.prs	60 年代拉格摇滚
+rock/60sRock&RollBand.T548.prs	60 年代早期摇滚乐队
+rock/60sRockRebel.T548.prs	60 年代叛逆摇滚
+rock/70sBritSoftRock.T548.prs	70 年代英伦软摇滚
+rock/70sDutchRock.T548.prs	70 年代荷兰摇滚
+rock/70sHardRock.T548.prs	70 年代硬摇滚
+rock/70sPianoRock.T548.prs	70 年代钢琴摇滚
+rock/70sShuffleRock.T548.sst	70 年代摇摆律动摇滚
+rock/70sStraightRock.T548.sst	70 年代直拍摇滚
+rock/70sUK SoftRock.T548.prs	70 年代英国软摇滚
+rock/70sUS BluesRock.T548.prs	70 年代美式布鲁斯摇滚
+rock/70sUS ClassicRock.T548.prs	70 年代美国经典摇滚
+rock/80s6-8SoftRock.T548.prs	80 年代六八拍软摇滚
+rock/80sClassicRock.T548.prs	80 年代经典摇滚
+rock/80sEdgyRock.T548.prs	80 年代锋利摇滚
+rock/80sMajestyRock.T548.prs	80 年代雄壮摇滚
+rock/80sPianoRock.T548.prs	80 年代钢琴摇滚
+rock/80sPolishBluesRock.T548.prs	80 年代波兰布鲁斯摇滚
+rock/80sPowerRock.T548.prs	80 年代强力摇滚
+rock/80sRockAnthem.T548.prs	80 年代摇滚颂歌
+rock/80sRockBallad.T548.prs	80 年代摇滚抒情
+rock/80sRockBeat.T548.prs	80 年代摇滚节拍
+rock/80sRockDiva.T548.prs	80 年代摇滚女声
+rock/80sSoftRock.T548.prs	80 年代软摇滚
+rock/80sSynthRock.T548.prs	80 年代合成器摇滚
+rock/90sAltGrungeRock.T548.prs	90 年代另类油渍摇滚
+rock/90sAltRock.T548.prs	90 年代另类摇滚
+rock/90sHardRockBallad.T548.prs	90 年代硬摇滚抒情
+rock/90sLatinRockBallad.T548.prs	90 年代拉丁摇滚抒情
+rock/90sRockBallad.T548.prs	90 年代摇滚抒情
+rock/90sScotsSoftRock.T548.prs	90 年代苏格兰软摇滚
+rock/AcousticRock.T548.prs	原声摇滚
+rock/BigRockBallad.T548.prs	大气摇滚抒情
+rock/BritRockPop.T548.prs	英伦流行摇滚
+rock/CanadianRock.T548.prs	加拿大摇滚
+rock/GlamPianoRock.T548.prs	华丽钢琴摇滚
+rock/GrungeRock.T548.prs	油渍摇滚
+rock/HighRoadRock.T548.prs	公路摇滚
+rock/IndieRock.T548.prs	独立摇滚
+rock/OrchRockBallad1.T548.prs	管弦摇滚抒情 1
+rock/OrchRockBallad2.T548.prs	管弦摇滚抒情 2
+rock/PowerRock.T548.prs	强力摇滚
+rock/ProgressivePop.T548.prs	前卫流行
+rock/StadiumRock.T548.prs	体育场摇滚
+rock/StandardRock.T548.prs	标准摇滚
+rock/UK SoftRock.T548.prs	英国软摇滚
+rock/US RockShuffle.T548.prs	美式摇滚摇摆律动
+trad-folk/AlpenLand.T561.prs	阿尔卑斯山乡
+trad-folk/BohemianWaltz.T561.prs	波希米亚华尔兹
+trad-folk/BrassBand.T561.fps	铜管乐队
+trad-folk/CelticDance.T561.prs	凯尔特舞曲
+trad-folk/CelticDance3-4.T561.prs	三四拍凯尔特舞曲
+trad-folk/FastKrainerWaltz.T561.sst	快速克赖纳华尔兹
+trad-folk/FastPolkaKrainer.T561.sst	快速克赖纳波尔卡
+trad-folk/Flamenco.T561.prs	弗拉门戈
+trad-folk/FrenchMusette.T561.prs	法式缪塞特
+trad-folk/FrenchWaltz.T561.prs	法式华尔兹
+trad-folk/GermanMarch.T561.prs	德国进行曲
+trad-folk/GermanWaltz.T561.prs	德国华尔兹
+trad-folk/IrishDance.T561.prs	爱尔兰舞曲
+trad-folk/IrishHymn.T561.prs	爱尔兰赞美诗
+trad-folk/ItalianMazurka.T561.prs	意大利玛祖卡
+trad-folk/ItalianWaltz.T561.prs	意大利华尔兹
+trad-folk/MariachiWaltz.T561.prs	墨西哥马里亚奇华尔兹
+trad-folk/MexicanDance.T561.prs	墨西哥舞曲
+trad-folk/OberkrainerPolka1.T561.prs	上克赖纳波尔卡 1
+trad-folk/OberkrainerPolka2.T561.prs	上克赖纳波尔卡 2
+trad-folk/OberkrainerPolka3.T561.prs	上克赖纳波尔卡 3
+trad-folk/OberkrainerWaltz1.T561.sst	上克赖纳华尔兹 1
+trad-folk/OberkrainerWaltz2.T561.prs	上克赖纳华尔兹 2
+trad-folk/OberkrainerWaltz3.T561.sst	上克赖纳华尔兹 3
+trad-folk/PolkaTrumpet.T561.sst	小号波尔卡
+trad-folk/ScottishJig.T561.prs	苏格兰吉格
+trad-folk/ScottishPolka.T561.prs	苏格兰波尔卡
+trad-folk/ScottishReel.T561.prs	苏格兰里尔
+trad-folk/ScottishStrathspey.T561.prs	苏格兰斯特拉斯佩
+trad-folk/ScottishWaltz.T561.prs	苏格兰华尔兹
+trad-folk/Sirtaki.T561.prs	希腊西尔塔基舞
+trad-folk/SlowKrainerWaltz.T561.sst	慢速克赖纳华尔兹
+trad-folk/SpanishPaso.T561.prs	西班牙斗牛舞
+trad-folk/StubnmusiWaltz.T561.prs	阿尔卑斯客厅华尔兹
+trad-folk/SwingingMusette.T561.prs	摇摆缪塞特
+trad-folk/Tarantella.T561.prs	塔兰泰拉
+trad-folk/TheaterMarch.T561.prs	剧场进行曲
+trad-folk/ZitherPolka.T561.prs	齐特琴波尔卡

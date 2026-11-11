@@ -1,0 +1,5 @@
+alphaTab 1.9.0 is used only to generate editable Guitar Pro files.
+Unmodified npm distribution @coderline/alphatab@1.9.0 (Mozilla Public License 2.0).
+Source code: https://github.com/CoderLine/alphaTab
+Release source: https://github.com/CoderLine/alphaTab/tree/v1.9.0
+Package: https://www.npmjs.com/package/@coderline/alphatab/v/1.9.0

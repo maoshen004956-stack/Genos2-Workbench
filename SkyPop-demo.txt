@@ -1,0 +1,22 @@
+// 每个 | 分隔一小节。小节内两个和弦用空格分隔，默认均分时值。
+// Main 的长度由输入的小节数决定。前奏、加花和尾奏按 Style 的长度演奏，
+// 如果这些段落的和弦少于实际小节，最后一个和弦会持续到段落结束。
+style = pop/SkyPop.T547.prs
+bpm = 112
+
+[Intro A] 前奏
+C
+
+[Main A] 主歌
+C | G/B | Am7 | Fadd9
+C/E | F | Dm7 G7 | C
+
+[Fill In DD] 加花
+G7
+
+[Main D] 副歌
+F | G | Em7 | Am7
+F | C/E | Dm7:1 G7:3 | C
+
+[Ending A] 尾奏
+C
