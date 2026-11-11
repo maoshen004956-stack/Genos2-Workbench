@@ -127,6 +127,13 @@ final class FluidSynthSession {
 
     func reset() throws {
         _ = api.systemReset(synth)
+        // FluidSynth queues DSP changes even with threadsafe-api disabled. When
+        // seeking while paused there is no audio callback to consume the reset,
+        // so old voices otherwise remain in its render queue while the complete
+        // controller history is replayed. Discard two internal blocks before
+        // restoring channel state; this retires old voices and clears effects.
+        // Two blocks also cover a partially consumed 64-frame synth buffer.
+        try drainCommands()
         programs.removeAll(keepingCapacity: true); controllers.removeAll(keepingCapacity: true)
         for track in tracks {
             let part = track.part
@@ -136,6 +143,19 @@ final class FluidSynthSession {
             try selectProgram(part)
             for controller: UInt8 in [7, 10, 11, 91, 93] { applyController(controller, for: part) }
         }
+    }
+
+    /// Consume queued DSP updates without advancing the song's musical cursor.
+    /// Used only while rebuilding a seek target, before its held notes are restored.
+    func drainCommands() throws {
+        var left = [Float](repeating: 0, count: 128)
+        var right = [Float](repeating: 0, count: 128)
+        let status = left.withUnsafeMutableBufferPointer { l in
+            right.withUnsafeMutableBufferPointer { r in
+                api.renderFloat(synth, 128, l.baseAddress, 0, 1, r.baseAddress, 0, 1)
+            }
+        }
+        guard status == 0 else { throw invalid("音源定位失败，请重新开始试听。") }
     }
 
     func selectProgram(_ part: AccompanimentPart) throws {
@@ -246,6 +266,7 @@ final class FluidPlaybackState {
         var held: [AccompanimentPart: [UInt8: UInt8]] = [:]
         var sustained: [AccompanimentPart: [UInt8: UInt8]] = [:]
         var pedals: [AccompanimentPart: Bool] = [:]
+        var pendingCommands = 0
         while next < events.count, events[next].frame < cursor {
             let event = events[next], midi = event.midi, part = event.part
             switch midi.kind {
@@ -264,8 +285,19 @@ final class FluidPlaybackState {
             default: break
             }
             try session.dispatch(midi, part: part, notes: false)
+            if [0xb0, 0xc0, 0xd0, 0xe0].contains(midi.kind) {
+                pendingCommands += 1
+                // Preserve the order of RPN/NRPN, reset and relative controllers.
+                // Replaying a long history without rendering would overflow
+                // FluidSynth's DSP queue, particularly when playback is paused.
+                if pendingCommands == 32 {
+                    try session.drainCommands()
+                    pendingCommands = 0
+                }
+            }
             next += 1
         }
+        try session.drainCommands()
         for part in AccompanimentPart.allCases {
             for (key, velocity) in held[part] ?? [:] {
                 try session.dispatch(MIDI(0x90, key, velocity), part: part)
