@@ -441,6 +441,7 @@ private struct WorkbenchView: View {
             .overlay { RoundedRectangle(cornerRadius: 9).strokeBorder(line) }
 
             Button {
+                editingBar = nil
                 workspace.togglePreview()
             } label: {
                 Label(workspace.preview == .idle ? "试听" : workspace.preview == .loading ? "取消" : "停止",
@@ -559,9 +560,10 @@ private struct WorkbenchView: View {
                 .fixedSize()
                 .disabled(workspace.patterns.isEmpty)
             }
-            if let bar = workspace.previewBar {
+            if let position = workspace.previewPosition {
                 HStack(spacing: 10) {
-                    Text("试听中 · 第 \(bar) 小节").font(.system(size: 11, weight: .semibold))
+                    Text("试听中 · 第 \(position.barNumber) 小节 · \(position.chord ?? "–")")
+                        .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(violet)
                     ProgressView(value: workspace.previewProgress)
                         .tint(violet)
@@ -573,20 +575,26 @@ private struct WorkbenchView: View {
                     .font(.system(size: 12)).foregroundStyle(muted)
                     .frame(maxWidth: .infinity, minHeight: 60, alignment: .leading)
             } else {
-                ScrollView(.horizontal) {
-                    HStack(spacing: 9) {
-                        ForEach(workspace.draft.blocks) { block in
-                            SectionCard(block: block, workspace: workspace, targeted: target == .segment(block.id),
-                                        dragAction: handleDrag)
-                                .targetFrame(.segment(block.id))
-                                .contextMenu {
-                                    Button("删除段落", role: .destructive) { delete(block.id) }
-                                }
+                ScrollViewReader { proxy in
+                    ScrollView(.horizontal) {
+                        HStack(spacing: 9) {
+                            ForEach(workspace.draft.blocks) { block in
+                                SectionCard(block: block, workspace: workspace, targeted: target == .segment(block.id),
+                                            dragAction: handleDrag)
+                                    .targetFrame(.segment(block.id))
+                                    .contextMenu {
+                                        Button("删除段落", role: .destructive) { delete(block.id) }
+                                    }
+                                    .id(block.id)
+                            }
                         }
+                        .padding(1)
                     }
-                    .padding(1)
+                    .scrollIndicators(.hidden)
+                    .onChange(of: workspace.previewPosition?.sectionID) { _, id in
+                        if let id { proxy.scrollTo(id) }
+                    }
                 }
-                .scrollIndicators(.hidden)
             }
         }
         .padding(15)
@@ -673,6 +681,15 @@ private struct WorkbenchView: View {
     }
 
     private var editor: some View {
+        let playingBar = workspace.previewPosition.map { DropLocation.bar($0.sectionID, $0.barIndex) }
+        return ScrollViewReader { proxy in
+            chordEditor.onChange(of: playingBar) { _, id in
+                if let id { proxy.scrollTo(id) }
+            }
+        }
+    }
+
+    private var chordEditor: some View {
         ScrollView {
             if let block = workspace.current {
                 VStack(alignment: .leading, spacing: 13) {
@@ -722,6 +739,7 @@ private struct WorkbenchView: View {
                             BarCell(block: block, index: index, workspace: workspace, editing: $editingBar,
                                     targeted: target == .bar(block.id, index), dragAction: handleDrag)
                                 .targetFrame(.bar(block.id, index))
+                                .id(DropLocation.bar(block.id, index))
                         }
                         if block.allowsResizing {
                             Button { workspace.addBar(to: block) } label: {
@@ -911,9 +929,11 @@ private struct SectionCard: View {
     var body: some View {
         let selected = workspace.selectedBlock == block.id
         let tint = SectionTint(block.pattern)
-        let start = workspace.startBar(block.id)
-        let playing = workspace.previewBar.map { (start..<start + workspace.count(block)).contains($0) } ?? false
-        Button { workspace.select(block.id) } label: {
+        let playing = workspace.previewPosition?.sectionID == block.id
+        Button {
+            workspace.stopPreview()
+            workspace.select(block.id)
+        } label: {
             VStack(alignment: .leading, spacing: 6) {
                 HStack(spacing: 5) {
                     Text(patternDisplayName(block.pattern))
@@ -957,6 +977,8 @@ private struct BarCell: View {
     var body: some View {
         let selected = workspace.selectedBar == index
         let text = workspace.bar(block.id, at: index)
+        let playhead = workspace.previewPosition
+        let playing = playhead?.sectionID == block.id && playhead?.barIndex == index
         let invalidChord = workspace.style.map {
             (try? chordChanges(in: text, style: $0, meter: workspace.meter, context: "")) == nil
         } ?? false
@@ -967,7 +989,10 @@ private struct BarCell: View {
                 Text(String(format: "%02d", bar)).font(.system(size: 10, weight: .semibold, design: .monospaced))
                     .foregroundStyle(selected ? violet : muted)
                 Spacer()
-                if invalidChord {
+                if playing {
+                    Image(systemName: "play.fill").font(.system(size: 9)).foregroundStyle(violet)
+                        .accessibilityHidden(true)
+                } else if invalidChord {
                     Image(systemName: "exclamationmark.circle.fill").font(.system(size: 10))
                         .foregroundStyle(Color(hex: 0xB74746)).help("检查和弦名称或拍数")
                 }
@@ -976,28 +1001,36 @@ private struct BarCell: View {
                     .arrangeDrag(.measure(block.id, index, text), action: dragAction)
                     .help("拖动以交换两个小节的和弦")
             }
-            TextField("输入和弦", text: Binding(get: {
-                workspace.bar(block.id, at: index)
-            }, set: { workspace.setBar(block.id, at: index, to: $0) }))
-            .font(.system(size: 15, weight: .semibold, design: .monospaced))
-            .textFieldStyle(.plain)
-            .focused(editing, equals: index)
-            .accessibilityLabel("第 \(bar) 小节和弦")
-            .accessibilityIdentifier("bar-\(index + 1)")
-            .onSubmit {
-                if index + 1 < workspace.count(block) { editing.wrappedValue = index + 1 }
-                else { editing.wrappedValue = nil }
+            if playing, let playhead {
+                playingChords(text, position: playhead)
+            } else if playhead != nil {
+                Text(text).font(.system(size: 15, weight: .semibold, design: .monospaced)).lineLimit(1)
+            } else {
+                TextField("输入和弦", text: Binding(get: {
+                    workspace.bar(block.id, at: index)
+                }, set: { workspace.setBar(block.id, at: index, to: $0) }))
+                .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                .textFieldStyle(.plain)
+                .focused(editing, equals: index)
+                .accessibilityLabel("第 \(bar) 小节和弦")
+                .accessibilityIdentifier("bar-\(index + 1)")
+                .onSubmit {
+                    if index + 1 < workspace.count(block) { editing.wrappedValue = index + 1 }
+                    else { editing.wrappedValue = nil }
+                }
             }
         }
         .padding(.horizontal, 10).padding(.vertical, 7)
         .frame(minHeight: 61)
-        .background(selected || targeted ? violetTint.opacity(0.72) : canvas, in: RoundedRectangle(cornerRadius: 8))
+        .background(playing || selected || targeted ? violetTint.opacity(0.72) : canvas,
+                    in: RoundedRectangle(cornerRadius: 8))
         .overlay { RoundedRectangle(cornerRadius: 8).strokeBorder(
-            invalidChord ? Color(hex: 0xD57877) : (selected || targeted ? violet : line),
-            lineWidth: targeted ? 2 : 1
+            playing ? violet : invalidChord ? Color(hex: 0xD57877) : (selected || targeted ? violet : line),
+            lineWidth: playing || targeted ? 2 : 1
         ) }
         .contentShape(Rectangle())
         .onTapGesture {
+            workspace.stopPreview()
             workspace.selectedBar = index
             editing.wrappedValue = index
         }
@@ -1007,5 +1040,25 @@ private struct BarCell: View {
                     .disabled(workspace.count(block) <= 1)
             }
         }
+    }
+
+    private func playingChords(_ text: String, position: PreviewTimeline.Position) -> some View {
+        let written = text.split(whereSeparator: \.isWhitespace).map { String($0.prefix { $0 != ":" }) }
+        let symbols = position.chordIndex == nil ? [position.chord ?? "–"] : written
+        let activeIndex = position.chordIndex ?? 0
+        return HStack(spacing: 5) {
+            ForEach(symbols.indices, id: \.self) { index in
+                let active = index == activeIndex
+                Text(symbols[index])
+                    .font(.system(size: 15, weight: .semibold, design: .monospaced))
+                    .lineLimit(1).minimumScaleFactor(0.75)
+                    .padding(.horizontal, 4)
+                    .foregroundStyle(active ? Color.white : muted)
+                    .background(active ? violet : .clear, in: RoundedRectangle(cornerRadius: 4))
+                    .layoutPriority(active ? 1 : 0)
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("第 \(position.barNumber) 小节，正在播放 \(position.chord ?? "")")
     }
 }

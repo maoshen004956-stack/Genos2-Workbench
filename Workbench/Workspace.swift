@@ -92,7 +92,7 @@ final class Workspace: ObservableObject {
     @Published var exported: Exported?
     @Published private(set) var preview: PreviewState = .idle
     @Published private(set) var previewProgress = 0.0
-    @Published private(set) var previewBar: Int?
+    @Published private(set) var previewPosition: PreviewTimeline.Position?
 
     enum PreviewState { case idle, loading, playing }
     private var player: AVMIDIPlayer?
@@ -511,6 +511,7 @@ final class Workspace: ObservableObject {
         guard let style else { return }
         do {
             let chart = try makeChart(style: style)
+            let sectionIDs = draft.blocks.map(\.id)
             let token = UUID()
             previewToken = token
             preview = .loading
@@ -523,7 +524,8 @@ final class Workspace: ObservableObject {
                         }
                     }
                     guard previewToken == token else { return }
-                    try play(rendered, token: token)
+                    let timeline = PreviewTimeline(arrangement: rendered, chart: chart, sectionIDs: sectionIDs)
+                    try play(rendered.midi, timeline: timeline, token: token)
                 } catch {
                     guard previewToken == token else { return }
                     stopPreview()
@@ -533,19 +535,19 @@ final class Workspace: ObservableObject {
         } catch { message = error.localizedDescription }
     }
 
-    private func play(_ arrangement: ArrangementResult, token: UUID) throws {
-        let player = try AVMIDIPlayer(data: arrangement.midi, soundBankURL: nil)
+    private func play(_ midi: Data, timeline: PreviewTimeline, token: UUID) throws {
+        let player = try AVMIDIPlayer(data: midi, soundBankURL: nil)
         player.prepareToPlay()
         self.player = player
         preview = .playing
-        previewBar = 1
-        let barSeconds = Double(arrangement.ticksPerBar) / Double(arrangement.style.ticksPerQuarter) * 60 / arrangement.bpm
-        let duration = barSeconds * Double(arrangement.barCount)
-        let timer = Timer(timeInterval: 0.12, repeats: true) { [weak self] _ in
+        followPreview(timeline.position(at: 0))
+        let timer = Timer(timeInterval: 0.05, repeats: true) { [weak self] _ in
             Task { @MainActor in
                 guard let self, self.previewToken == token, let player = self.player else { return }
-                self.previewProgress = min(1, player.currentPosition / duration)
-                self.previewBar = min(arrangement.barCount, Int(player.currentPosition / barSeconds) + 1)
+                let time = player.currentPosition
+                let progress = min(1, time / timeline.duration)
+                if progress - self.previewProgress >= 0.002 { self.previewProgress = progress }
+                self.followPreview(timeline.position(at: time))
             }
         }
         previewTimer = timer
@@ -557,6 +559,15 @@ final class Workspace: ObservableObject {
         }
     }
 
+    private func followPreview(_ position: PreviewTimeline.Position?) {
+        guard let position, previewPosition != position else { return }
+        if previewPosition?.barNumber != position.barNumber {
+            if selectedBlock != position.sectionID { selectedBlock = position.sectionID }
+            if selectedBar != position.barIndex { selectedBar = position.barIndex }
+        }
+        previewPosition = position
+    }
+
     func stopPreview() {
         guard preview != .idle else { return }
         previewToken = nil
@@ -564,7 +575,7 @@ final class Workspace: ObservableObject {
         previewTimer = nil
         player?.stop()
         player = nil
-        previewBar = nil
+        previewPosition = nil
         previewProgress = 0
         preview = .idle
     }
