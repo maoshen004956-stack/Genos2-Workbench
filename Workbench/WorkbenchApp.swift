@@ -16,7 +16,16 @@ struct WorkbenchApp: App {
         .defaultSize(width: 1240, height: 790)
         .windowStyle(.hiddenTitleBar)
         .commands {
-            CommandGroup(replacing: .newItem) {}
+            CommandGroup(replacing: .newItem) {
+                Button("打开编曲工程…") { workspace.chooseProjectFile(undoManager: NSApp.keyWindow?.undoManager) }
+                    .keyboardShortcut("o", modifiers: .command)
+                Button("导入 iReal Pro…") { workspace.chooseIRealFile() }
+                    .keyboardShortcut("i", modifiers: [.command, .shift])
+            }
+            CommandGroup(replacing: .saveItem) {
+                Button("保存编曲工程…") { workspace.saveProject() }
+                    .keyboardShortcut("s", modifiers: .command)
+            }
         }
     }
 }
@@ -141,6 +150,12 @@ private struct WorkbenchView: View {
             .foregroundStyle(ink)
         }
         .coordinateSpace(name: dragSpace)
+        .onOpenURL { openFiles([$0]) }
+        .dropDestination(for: URL.self) { urls, _ in
+            guard !urls.isEmpty else { return false }
+            openFiles(urls)
+            return true
+        }
         .onPreferenceChange(DropFrames.self) { dropFrames = $0 }
         .overlay(alignment: .topLeading) {
             if let drag {
@@ -169,6 +184,29 @@ private struct WorkbenchView: View {
             Text("当前草稿将由新编曲替换。")
         }
         .sheet(isPresented: $showPaste) { pastePanel }
+        .sheet(item: $workspace.pendingIRealImport) { batch in
+            IRealImportView(batch: batch, workspace: workspace, undoManager: undoManager)
+        }
+        .onAppear {
+            paletteRoot = workspace.key.tonic
+            category = workspace.activeEntry?.category ?? ""
+        }
+        .onChange(of: workspace.key) { _, key in paletteRoot = key.tonic }
+        .onChange(of: workspace.draft.stylePath) { _, _ in
+            category = workspace.activeEntry?.category ?? ""
+            query = ""
+        }
+    }
+
+    private func openFiles(_ urls: [URL]) {
+        if urls.contains(where: { $0.pathExtension.lowercased() == "genos2song" }) {
+            guard urls.count == 1 else {
+                workspace.message = "请一次打开一个编曲工程。"
+                return
+            }
+            do { try workspace.loadProject(at: urls[0], undoManager: undoManager) }
+            catch { workspace.message = error.localizedDescription }
+        } else { workspace.readIRealFiles(urls) }
     }
 
     private var target: DropLocation? {
@@ -296,10 +334,21 @@ private struct WorkbenchView: View {
                     .onAppear {
                         proxy.scrollTo(workspace.draft.stylePath, anchor: .center)
                     }
+                    .onChange(of: workspace.draft.stylePath) { _, value in
+                        proxy.scrollTo(value, anchor: .center)
+                    }
                 }
             }
 
             Rectangle().fill(.white.opacity(0.12)).frame(height: 1)
+            Button { workspace.chooseIRealFile() } label: {
+                Label("导入 iReal Pro 歌曲…", systemImage: "doc.badge.arrow.up")
+                    .font(.system(size: 12, weight: .semibold))
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(.horizontal, 19).padding(.top, 15)
+            }
+            .buttonStyle(.plain)
+            .help("导入 HTML 歌曲或歌单，也可以把文件拖进窗口（⇧⌘I）")
             HStack {
                 Menu {
                     Button("导入到\(categoryLabels[category] ?? categoryLabels[workspace.activeEntry?.category ?? "pop"] ?? "流行")…") {
@@ -321,6 +370,12 @@ private struct WorkbenchView: View {
                 .fixedSize()
                 .colorScheme(.dark)
                 Spacer()
+                Menu {
+                    Button("打开工程…") { workspace.chooseProjectFile(undoManager: undoManager) }
+                    Button("保存工程…") { workspace.saveProject() }
+                } label: { Image(systemName: "folder") }
+                .menuStyle(.borderlessButton).fixedSize()
+                .help("保存与打开独立编曲工程（⌘S / ⌘O）").accessibilityLabel("编曲工程")
                 Button { confirmNew = true } label: { Image(systemName: "square.and.pencil") }
                     .buttonStyle(.plain).help("新建编曲").accessibilityLabel("新建编曲")
             }
@@ -827,17 +882,25 @@ private struct WorkbenchView: View {
     }
 
     private var paletteChords: [String] {
-        let steps = [0, 2, 4, 5, 7, 9, 11]
+        let minor = workspace.key.minor
+        let steps = minor ? [0, 2, 3, 5, 7, 8, 10] : [0, 2, 4, 5, 7, 9, 11]
+        func name(_ root: Int, _ quality: Chord.Quality) -> String {
+            workspace.key.spell(root) + Chord(root: 0, quality: quality).name.dropFirst()
+        }
         switch paletteMode {
         case .triads:
-            let qualities: [Chord.Quality] = [.major, .minor, .minor, .major, .major, .minor, .diminished]
-            return zip(steps, qualities).map { Chord(root: paletteRoot + $0, quality: $1).name }
+            let qualities: [Chord.Quality] = minor
+                ? [.minor, .diminished, .major, .minor, .minor, .major, .major]
+                : [.major, .minor, .minor, .major, .major, .minor, .diminished]
+            return zip(steps, qualities).map { name(paletteRoot + $0, $1) }
         case .sevenths:
-            let qualities: [Chord.Quality] = [.majorSeventh, .minorSeventh, .minorSeventh, .majorSeventh, .seventh, .minorSeventh, .halfDiminished]
-            return zip(steps, qualities).map { Chord(root: paletteRoot + $0, quality: $1).name }
+            let qualities: [Chord.Quality] = minor
+                ? [.minorSeventh, .halfDiminished, .majorSeventh, .minorSeventh, .minorSeventh, .majorSeventh, .seventh]
+                : [.majorSeventh, .minorSeventh, .minorSeventh, .majorSeventh, .seventh, .minorSeventh, .halfDiminished]
+            return zip(steps, qualities).map { name(paletteRoot + $0, $1) }
         case .colors:
             return [Chord.Quality.suspended, .suspendedSecond, .addNine, .sixth, .majorSeventhNine, .seventhSuspended]
-                .map { Chord(root: paletteRoot, quality: $0).name }
+                .map { name(paletteRoot, $0) }
         }
     }
 

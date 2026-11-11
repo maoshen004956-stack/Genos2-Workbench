@@ -39,8 +39,29 @@ else
     <key>CFBundleName</key><string>伴奏工作台</string>
     <key>CFBundleDisplayName</key><string>伴奏工作台</string>
     <key>CFBundlePackageType</key><string>APPL</string>
-    <key>CFBundleShortVersionString</key><string>1.4</string>
-    <key>CFBundleVersion</key><string>6</string>
+    <key>CFBundleShortVersionString</key><string>1.5</string>
+    <key>CFBundleVersion</key><string>7</string>
+    <key>CFBundleDocumentTypes</key>
+    <array><dict>
+        <key>CFBundleTypeName</key><string>iReal Pro 歌曲</string>
+        <key>CFBundleTypeRole</key><string>Viewer</string>
+        <key>LSHandlerRank</key><string>Alternate</string>
+        <key>LSItemContentTypes</key><array><string>public.html</string><string>public.plain-text</string></array>
+    </dict><dict>
+        <key>CFBundleTypeName</key><string>伴奏工作台工程</string>
+        <key>CFBundleTypeRole</key><string>Editor</string>
+        <key>LSHandlerRank</key><string>Owner</string>
+        <key>LSItemContentTypes</key><array><string>com.local.genos2.song</string></array>
+    </dict></array>
+    <key>UTExportedTypeDeclarations</key>
+    <array><dict>
+        <key>UTTypeIdentifier</key><string>com.local.genos2.song</string>
+        <key>UTTypeDescription</key><string>伴奏工作台工程</string>
+        <key>UTTypeConformsTo</key><array><string>public.json</string></array>
+        <key>UTTypeTagSpecification</key><dict>
+            <key>public.filename-extension</key><array><string>genos2song</string></array>
+        </dict>
+    </dict></array>
     <key>CFBundleDevelopmentRegion</key><string>zh-Hans</string>
     <key>CFBundleLocalizations</key><array><string>zh-Hans</string></array>
     <key>CFBundleIconFile</key><string>Workbench.icns</string>

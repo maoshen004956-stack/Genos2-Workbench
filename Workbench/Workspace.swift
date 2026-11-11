@@ -90,6 +90,7 @@ final class Workspace: ObservableObject {
     @Published var message: String?
     @Published var busy = false
     @Published var exported: Exported?
+    @Published var pendingIRealImport: IRealImportBatch?
     @Published private(set) var preview: PreviewState = .idle
     @Published private(set) var previewProgress = 0.0
     @Published private(set) var previewPosition: PreviewTimeline.Position?
@@ -325,7 +326,67 @@ final class Workspace: ObservableObject {
         undoManager?.setActionName("载入风格示例")
     }
 
-    private func replaceDraft(_ value: Draft, selection: UUID?, undoManager: UndoManager?) {
+    func chooseIRealFile() {
+        let panel = NSOpenPanel()
+        panel.title = "导入 iReal Pro 歌曲或歌单"
+        panel.prompt = "读取歌曲"
+        panel.allowedContentTypes = [.html, .plainText]
+        panel.allowsMultipleSelection = true
+        guard panel.runModal() == .OK else { return }
+        readIRealFiles(panel.urls)
+    }
+
+    func readIRealFiles(_ urls: [URL]) {
+        do {
+            var songs: [IRealSong] = []
+            for url in urls {
+                let access = url.startAccessingSecurityScopedResource()
+                defer { if access { url.stopAccessingSecurityScopedResource() } }
+                let data: Data
+                if url.isFileURL {
+                    let size = try url.resourceValues(forKeys: [.fileSizeKey]).fileSize ?? 0
+                    guard size <= 8_000_000 else { throw invalid("iReal Pro 文件过大，请分批导出歌单。") }
+                    data = try Data(contentsOf: url)
+                } else {
+                    data = Data(url.absoluteString.utf8)
+                }
+                songs += try IRealImport.parse(data: data)
+            }
+            guard !songs.isEmpty else { throw invalid("文件里没有可导入的 iReal Pro 歌曲。") }
+            pendingIRealImport = IRealImportBatch(songs: songs)
+        } catch { message = error.localizedDescription }
+    }
+
+    func suggestedStyle(for song: IRealSong) -> StyleEntry? {
+        let name = song.style.lowercased()
+        let candidates: [String]
+        if song.meter == SongMeter(3, 4) || name.contains("waltz") {
+            candidates = ["MediumJazzWaltz", "SlowJazzWaltz"]
+        } else if name.contains("bossa") { candidates = ["BossaNova"] }
+        else if name.contains("blues") { candidates = ["BigBandBlues", "TheBlues"] }
+        else if name.contains("swing") || name.contains("jazz") { candidates = ["BigBandSwing", "JazzClub"] }
+        else if name.contains("samba") { candidates = ["Samba"] }
+        else { candidates = [] }
+        for candidate in candidates {
+            if let entry = entries.first(where: { $0.originalName == candidate }),
+               let style = try? Style(url: entry.url), song.meter == nil || SongMeter(style) == song.meter {
+                return entry
+            }
+        }
+        return activeEntry
+    }
+
+    func loadIRealSong(_ song: IRealSong, stylePath: String, undoManager: UndoManager?) throws {
+        guard let entry = entries.first(where: { $0.path == stylePath }) else { throw invalid("请先选择伴奏风格。") }
+        let style = try Style(url: entry.url)
+        let value = try IRealArrangement.draft(song: song, entry: entry, style: style)
+        replaceDraft(value, selection: value.blocks.first?.id, undoManager: undoManager)
+        undoManager?.setActionName("导入 iReal Pro 歌曲")
+        exported = nil
+        pendingIRealImport = nil
+    }
+
+    func replaceDraft(_ value: Draft, selection: UUID?, undoManager: UndoManager?) {
         let previous = draft, previousSelection = selectedBlock
         draft = value
         selectedBlock = selection ?? value.blocks.first?.id

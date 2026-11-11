@@ -10,8 +10,8 @@ struct SongMeter: Codable, Hashable {
     init(_ beats: Int, _ unit: Int) { self.beats = beats; self.unit = unit }
     init(_ style: Style) { self.init(style.beatsPerBar, style.beatUnit) }
 
-    static let choices = [Self(2, 2), Self(2, 4), Self(3, 4), Self(4, 4), Self(5, 4), Self(6, 4),
-                          Self(3, 8), Self(6, 8), Self(7, 8), Self(9, 8), Self(12, 8)]
+    static let choices = [Self(2, 2), Self(3, 2), Self(2, 4), Self(3, 4), Self(4, 4), Self(5, 4), Self(6, 4), Self(7, 4),
+                          Self(3, 8), Self(5, 8), Self(6, 8), Self(7, 8), Self(9, 8), Self(12, 8)]
 }
 
 struct SongKey: Codable, Hashable {
@@ -19,7 +19,7 @@ struct SongKey: Codable, Hashable {
     let minor: Bool
 
     static let cMajor = Self(fifths: 0, minor: false)
-    static let choices = (-6...6).flatMap {
+    static let choices = (-7...7).flatMap {
         [Self(fifths: $0, minor: false), Self(fifths: $0, minor: true)]
     }
     private static let majorNames = ["C♭", "G♭", "D♭", "A♭", "E♭", "B♭", "F", "C",

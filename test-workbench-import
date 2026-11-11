@@ -1,0 +1,30 @@
+#!/bin/sh
+set -eu
+
+folder=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+build=$(mktemp -d "${TMPDIR:-/tmp}/genos2-import-tests.XXXXXXXX")
+trap 'rm -rf "$build"' EXIT
+. "$folder/style-library.sh"
+target="$(uname -m)-apple-macosx14.0"
+swiftc -target "$target" -module-cache-path "$build/modules" -emit-library -static -emit-module \
+    -module-name SXCore "$folder"/Sources/SXCore/*.swift -o "$build/libSXCore.a"
+
+set -- "$@"
+fixture=${1:-}
+for test in IRealImportTests VerifyProject; do
+    app="$build/$test.app"
+    mkdir -p "$app/Contents/MacOS" "$app/Contents/Resources/Genos2/pop"
+    cp "$style_library/pop/SkyPop.T547.prs" "$app/Contents/Resources/Genos2/pop/"
+    set -- "$folder/Sources/SXAudio/YamahaVoices.swift" "$folder/Instruments.swift" "$folder/Arrangement.swift"
+    for source in "$folder"/Workbench/*.swift; do
+        case "$source" in */WorkbenchApp.swift|*/IRealImportView.swift) continue ;; esac
+        set -- "$@" "$source"
+    done
+    swiftc -target "$target" -module-cache-path "$build/modules" -I "$build" -L "$build" -lSXCore \
+        "$@" "$folder/Tests/$test.swift" -o "$app/Contents/MacOS/check"
+    if [ "$test" = IRealImportTests ] && [ -n "$fixture" ]; then
+        "$app/Contents/MacOS/check" "$fixture"
+    else
+        "$app/Contents/MacOS/check"
+    fi
+done
