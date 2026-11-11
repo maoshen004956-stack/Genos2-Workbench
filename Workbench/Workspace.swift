@@ -44,6 +44,7 @@ struct Draft: Codable {
     var bpm = "112"
     var key: SongKey?
     var meter: SongMeter?
+    var mutedParts: Set<AccompanimentPart>?
     var blocks: [Block]
 
     static let demo = Draft(title: "天空流行编曲示例", blocks: [
@@ -123,6 +124,20 @@ final class Workspace: ObservableObject {
     var activeEntry: StyleEntry? { entries.first { $0.path == draft.stylePath } }
     var key: SongKey { draft.key ?? .cMajor }
     var meter: SongMeter? { draft.meter ?? style.map(SongMeter.init) }
+    var availableParts: Set<AccompanimentPart> {
+        guard let style, style.ticksPerBar > 0 else { return [] }
+        var parts: Set<AccompanimentPart> = []
+        for block in draft.blocks {
+            guard let section = style.sections.first(where: { $0.name == block.pattern }) else { continue }
+            let bars = count(block)
+            for (channel, tick) in section.firstNoteTickByPart where tick < section.length {
+                guard !block.allowsResizing || tick / style.ticksPerBar < bars else { continue }
+                if let part = AccompanimentPart(rawValue: channel) { parts.insert(part) }
+            }
+        }
+        return parts
+    }
+    var enabledParts: Set<AccompanimentPart> { availableParts.subtracting(draft.mutedParts ?? []) }
     var demo: StyleDemo? {
         guard let entry = activeEntry, let style else { return nil }
         return StyleDemo(entry: entry, style: style)
@@ -280,6 +295,20 @@ final class Workspace: ObservableObject {
         draft.meter = override
     }
 
+    func isPartEnabled(_ part: AccompanimentPart) -> Bool {
+        draft.mutedParts?.contains(part) != true
+    }
+
+    func setPart(_ part: AccompanimentPart, enabled: Bool) {
+        var muted = draft.mutedParts ?? []
+        if enabled { muted.remove(part) } else { muted.insert(part) }
+        draft.mutedParts = muted.isEmpty ? nil : muted
+    }
+
+    func setAllParts(enabled: Bool) {
+        draft.mutedParts = enabled ? nil : Set(AccompanimentPart.allCases)
+    }
+
     private func adaptChordTiming(from previous: SongMeter, to next: SongMeter, style: Style) {
         guard previous != next else { return }
         var updated = draft
@@ -311,8 +340,11 @@ final class Workspace: ObservableObject {
         let first = patterns.first { $0 == "Main A" } ?? patterns.first ?? "Main A"
         let tonic = key.tonicName + (key.minor ? "m" : "")
         let block = Draft.Block(name: "主歌", pattern: first, bars: Array(repeating: tonic, count: 4))
-        draft.title = "未命名编曲"
-        draft.blocks = [block]
+        var updated = draft
+        updated.title = "未命名编曲"
+        updated.blocks = [block]
+        updated.mutedParts = nil
+        draft = updated
         select(block.id)
     }
 
@@ -469,7 +501,9 @@ final class Workspace: ObservableObject {
         }
         guard !segments.isEmpty else { throw invalid("请先添加段落。") }
         for segment in segments { _ = try PlannedSegment(entry: segment, style: style, meter: meter) }
-        return Chart(style: draft.stylePath, bpm: bpm, key: key, meter: meter, segments: segments)
+        guard !enabledParts.isEmpty else { throw invalid("请至少选择一个当前编曲中使用的乐器声部。") }
+        return Chart(style: draft.stylePath, bpm: bpm, key: key, meter: meter,
+                     mutedParts: draft.mutedParts ?? [], segments: segments)
     }
 
     func togglePreview() {

@@ -107,6 +107,7 @@ private struct WorkbenchView: View {
     @State private var category = "pop"
     @State private var showExport = false
     @State private var showDemo = false
+    @State private var showInstruments = false
     @State private var showPaste = false
     @State private var pasteText = ""
     @State private var confirmNew = false
@@ -451,7 +452,7 @@ private struct WorkbenchView: View {
                     .background(violetTint, in: RoundedRectangle(cornerRadius: 9))
             }
             .buttonStyle(.plain)
-            .disabled(workspace.style == nil || workspace.draft.blocks.isEmpty)
+            .disabled(workspace.enabledParts.isEmpty)
             .help("用本机音源试听整曲伴奏")
 
             Button {
@@ -468,10 +469,10 @@ private struct WorkbenchView: View {
                 .padding(.horizontal, 14)
                 .frame(height: 38)
                 .background(violet, in: RoundedRectangle(cornerRadius: 9))
-                .opacity(workspace.style == nil || workspace.draft.blocks.isEmpty ? 0.45 : 1)
+                .opacity(workspace.enabledParts.isEmpty ? 0.45 : 1)
             }
             .buttonStyle(.plain)
-            .disabled(workspace.busy || workspace.style == nil || workspace.draft.blocks.isEmpty)
+            .disabled(workspace.busy || workspace.enabledParts.isEmpty)
             .keyboardShortcut("e", modifiers: .command)
             .popover(isPresented: $showExport, arrowEdge: .bottom) { exportPicker }
         }
@@ -522,12 +523,20 @@ private struct WorkbenchView: View {
     }
 
     private var timeline: some View {
-        VStack(alignment: .leading, spacing: 11) {
+        let available = workspace.availableParts
+        let enabled = available.subtracting(workspace.draft.mutedParts ?? []).count
+        return VStack(alignment: .leading, spacing: 11) {
             HStack {
                 Text("段落编排").font(.system(size: 14, weight: .bold))
                 Text("\(workspace.barCount) 小节").font(.system(size: 11, weight: .medium, design: .monospaced))
                     .foregroundStyle(muted)
                 Spacer()
+                Button { showInstruments = true } label: {
+                    Label("乐器 \(enabled)/\(available.count)", systemImage: "slider.horizontal.3")
+                }
+                .disabled(workspace.style == nil)
+                .help("选择参加试听和导出的乐器声部")
+                .popover(isPresented: $showInstruments) { instrumentPicker }
                 Button { showDemo = true } label: {
                     Label("风格示例", systemImage: "music.note.list")
                 }
@@ -585,6 +594,44 @@ private struct WorkbenchView: View {
         .overlay { RoundedRectangle(cornerRadius: 13).strokeBorder(line) }
         .padding(.horizontal, 27)
         .padding(.bottom, 13)
+    }
+
+    private var instrumentPicker: some View {
+        let available = workspace.availableParts
+        let enabled = workspace.enabledParts
+        return VStack(alignment: .leading, spacing: 12) {
+            HStack {
+                Text("乐器声部").font(.system(size: 16, weight: .bold))
+                Spacer()
+                Button("全选") { workspace.setAllParts(enabled: true) }
+                    .disabled(enabled == available)
+                Button("清空") { workspace.setAllParts(enabled: false) }
+                    .disabled(enabled.isEmpty)
+            }
+            if let style = workspace.style {
+                ForEach(AccompanimentPart.allCases) { part in
+                    let present = available.contains(part)
+                    let instrument = part.instrumentName(in: style)
+                    Toggle(isOn: Binding(get: { present && workspace.isPartEnabled(part) }, set: {
+                        workspace.setPart(part, enabled: $0)
+                    })) {
+                        HStack {
+                            Text(part.name).fontWeight(.medium)
+                            Spacer()
+                            Text(present ? instrument : "当前段落未使用").foregroundStyle(muted)
+                        }
+                    }
+                    .toggleStyle(.checkbox)
+                    .disabled(!present)
+                    .accessibilityLabel(part.name + "，" + (present ? instrument : "当前段落未使用"))
+                }
+            }
+            Text(enabled.isEmpty ? "至少选择一个声部，即可试听或导出。" : "仅试听和导出已勾选的声部。")
+                .font(.system(size: 11)).foregroundStyle(muted)
+        }
+        .frame(width: 280, alignment: .leading)
+        .padding(16)
+        .foregroundStyle(ink)
     }
 
     private var demoPicker: some View {

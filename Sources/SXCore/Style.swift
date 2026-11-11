@@ -41,6 +41,7 @@ public struct Style {
         public let name: String
         public let length: Int
         public let events: [Event]
+        public let firstNoteTickByPart: [UInt8: Int]
         let rules: [UInt8: Rule]
         let channelsWithGuitarTones: Set<UInt8>
     }
@@ -234,13 +235,18 @@ public struct Style {
         func closeSection() {
             guard let name = current, tick > start else { return }
             let sectionRules = rules[name] ?? [:]
-            let pitchedGuitarChannels = Set(events.compactMap { event -> UInt8? in
+            var firstNoteTickByPart: [UInt8: Int] = [:]
+            var pitchedGuitarChannels = Set<UInt8>()
+            for event in events {
                 let midi = event.midi
-                guard midi.kind == 0x90, midi.data2 > 0, midi.data1 < 96,
-                      sectionRules[midi.channel]?.zone(midi.data1).ntr == 2 else { return nil }
-                return midi.channel
-            })
-            sections.append(Section(name: name, length: tick - start, events: events, rules: sectionRules,
+                guard midi.kind == 0x90, midi.data2 > 0 else { continue }
+                let rule = sectionRules[midi.channel]
+                let part = rule?.destination ?? midi.channel
+                if part >= 8, firstNoteTickByPart[part] == nil { firstNoteTickByPart[part] = event.tick }
+                if midi.data1 < 96, rule?.zone(midi.data1).ntr == 2 { pitchedGuitarChannels.insert(midi.channel) }
+            }
+            sections.append(Section(name: name, length: tick - start, events: events,
+                                    firstNoteTickByPart: firstNoteTickByPart, rules: sectionRules,
                                     channelsWithGuitarTones: pitchedGuitarChannels))
         }
 

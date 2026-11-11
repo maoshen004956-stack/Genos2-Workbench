@@ -10,5 +10,5 @@ trap 'rm -rf "$build"' EXIT
 swiftc -O -module-cache-path "$build/modules" -emit-library -static -emit-module \
     -module-name SXCore "$sources"/SXCore/*.swift -o "$build/libSXCore.a"
 swiftc -O -module-cache-path "$build/modules" -I "$build" -L "$build" -lSXCore \
-    "$sources/SXAudio/YamahaVoices.swift" "$folder/Arrangement.swift" "$folder/main.swift" -o "$build/genos2-arrange"
+    "$sources/SXAudio/YamahaVoices.swift" "$folder/Instruments.swift" "$folder/Arrangement.swift" "$folder/main.swift" -o "$build/genos2-arrange"
 "$build/genos2-arrange" "$style_library" "$@"

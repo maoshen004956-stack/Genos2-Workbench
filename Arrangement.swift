@@ -105,13 +105,16 @@ struct Chart {
     var bpm: Double?
     var key: SongKey?
     var meter: SongMeter?
+    var mutedParts: Set<AccompanimentPart> = []
     var segments: [Segment] = []
 
-    init(style: String, bpm: Double?, key: SongKey? = nil, meter: SongMeter? = nil, segments: [Segment]) {
+    init(style: String, bpm: Double?, key: SongKey? = nil, meter: SongMeter? = nil,
+         mutedParts: Set<AccompanimentPart> = [], segments: [Segment]) {
         self.style = style
         self.bpm = bpm
         self.key = key
         self.meter = meter
+        self.mutedParts = mutedParts
         self.segments = segments
     }
 
@@ -287,29 +290,28 @@ func retimeChordBar(_ text: String, from previous: SongMeter, to next: SongMeter
     }.joined(separator: " ")
 }
 
-let partNames = ["Rhythm 1", "Rhythm 2", "Bass", "Chord 1", "Chord 2", "Pad", "Phrase 1", "Phrase 2"]
-
 struct PerformanceTrack {
-    let part: UInt8
+    let part: AccompanimentPart
     let name: String
+    let program: UInt8
     var events: [Style.Event] = []
     var noteOnCount = 0
     private var playing: [UInt8: UInt8] = [:]
     private var bankMSB: UInt8
     private var bankLSB: UInt8
     private var drumVoice: Style.VoiceAddress
-    var isDrum: Bool { part <= 9 }
-    var channel: UInt8 { isDrum ? 9 : part }
+    var isDrum: Bool { part.isDrum }
+    var channel: UInt8 { part.channel }
 
-    init(part: UInt8, style: Style) {
+    init(part: AccompanimentPart, style: Style) {
         self.part = part
-        name = partNames[Int(part) - 8]
-        let voice = style.voices[part] ?? .init(msb: 0, lsb: 0, program: part == 10 ? 33 : 0)
+        name = part.name + " · " + part.instrumentName(in: style)
+        program = part.program(in: style)
+        let voice = part.voice(in: style)
         bankMSB = voice.msb
         bankLSB = voice.lsb
         drumVoice = voice
         if !isDrum {
-            let program = YamahaVoices.melodicProgram(voice, guitar: style.guitarChannels.contains(part), bass: part == 10)
             add(MIDI(0xc0 | channel, program), at: 0)
         }
     }
@@ -431,7 +433,9 @@ func renderArrangement(_ chart: Chart, style: Style) throws -> ArrangementResult
           60_000_000 / bpm <= 0xff_ffff else { throw invalid("歌曲长度、速度或拍号超出 MIDI 格式范围") }
 
     var arranger = Arranger(style: style)
-    var tracks = (8...15).map { PerformanceTrack(part: UInt8($0), style: style) }
+    let enabled = Set(AccompanimentPart.allCases).subtracting(chart.mutedParts)
+    guard !enabled.isEmpty else { throw invalid("请至少选择一个要输出的乐器声部。") }
+    var tracks = AccompanimentPart.allCases.map { PerformanceTrack(part: $0, style: style) }
     var start = 0
     var markers: [(Int, String)] = []
     var harmony: [(Int, Chord)] = []
@@ -459,8 +463,8 @@ func renderArrangement(_ chart: Chart, style: Style) throws -> ArrangementResult
         write(arranger.stop(), at: start + rescaleTicks(segment.length, from: style.ticksPerBar, to: songBarTicks))
         start += segment.span
     }
-    let audibleTracks = tracks.filter { $0.noteOnCount > 0 }
-    guard !audibleTracks.isEmpty else { throw invalid("没有可导出的伴奏音符") }
+    let audibleTracks = tracks.filter { enabled.contains($0.part) && $0.noteOnCount > 0 }
+    guard !audibleTracks.isEmpty else { throw invalid("所选乐器声部在当前编曲里没有可播放的音符。") }
     return ArrangementResult(style: style, meter: meter, key: chart.key, bpm: bpm, duration: duration, tracks: audibleTracks,
                              markers: markers, harmony: harmony)
 }

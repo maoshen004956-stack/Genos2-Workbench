@@ -41,16 +41,14 @@ enum NotationExport {
             throw invalid("找不到 \(format) 导出组件。")
         }
         let key = arrangement.key ?? .cMajor
-        let names = ["节奏 1", "节奏 2", "贝斯", "和弦 1", "和弦 2", "铺底", "乐句 1", "乐句 2"]
         let tracks = arrangement.tracks.map { track in
-            let program = track.events.first(where: { $0.midi.kind == 0xc0 })?.midi.data1 ?? 0
             let notes = track.events.compactMap { event -> [Int]? in
                 let midi = event.midi
                 guard midi.kind == 0x80 || midi.kind == 0x90 else { return nil }
                 return [event.tick, Int(midi.data1), midi.kind == 0x80 ? 0 : Int(midi.data2)]
             }
-            return Input.Track(name: names[Int(track.part) - 8], program: program, channel: track.channel,
-                               drum: track.isDrum, bass: track.part == 10, notes: notes)
+            return Input.Track(name: track.name, program: track.program, channel: track.channel,
+                               drum: track.isDrum, bass: track.part == .bass, notes: notes)
         }
         let input = Input(title: title, numerator: arrangement.meter.beats, denominator: arrangement.meter.unit,
                           fifths: key.fifths, minor: key.minor, bpm: arrangement.bpm, ppq: arrangement.style.ticksPerQuarter,
