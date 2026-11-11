@@ -3,10 +3,11 @@ import Foundation
 import SXCore
 
 enum ArrangementFormat: String, Identifiable, CaseIterable {
-    case logic, museScore, guitarPro
+    case audio, logic, museScore, guitarPro
     var id: Self { self }
     var title: String {
         switch self {
+        case .audio: return "WAV 音频"
         case .logic: return "Logic Pro"
         case .museScore: return "MuseScore Studio"
         case .guitarPro: return "Guitar Pro 8"
@@ -14,6 +15,7 @@ enum ArrangementFormat: String, Identifiable, CaseIterable {
     }
     var extensionName: String {
         switch self {
+        case .audio: return "wav"
         case .logic: return "mid"
         case .museScore: return "mscz"
         case .guitarPro: return "gp"
@@ -21,6 +23,7 @@ enum ArrangementFormat: String, Identifiable, CaseIterable {
     }
     var symbol: String {
         switch self {
+        case .audio: return "waveform.circle.fill"
         case .logic: return "waveform"
         case .museScore: return "music.note.list"
         case .guitarPro: return "guitars"
@@ -28,6 +31,7 @@ enum ArrangementFormat: String, Identifiable, CaseIterable {
     }
     var subtitle: String {
         switch self {
+        case .audio: return "48 kHz · 24 位 · 保留当前音源与混音"
         case .logic: return "分轨 MIDI · 速度、调号、拍号和段落"
         case .museScore: return "MuseScore 工程 · 伴奏总谱、和弦和段落"
         case .guitarPro: return "Guitar Pro 乐谱 · 分轨五线谱、和弦和段落"
@@ -35,6 +39,7 @@ enum ArrangementFormat: String, Identifiable, CaseIterable {
     }
     var bundleID: String {
         switch self {
+        case .audio: return "com.apple.QuickTimePlayerX"
         case .logic: return "com.apple.logic10"
         case .museScore: return "org.musescore.MuseScore"
         case .guitarPro: return "com.arobas-music.guitarpro8"
@@ -44,8 +49,15 @@ enum ArrangementFormat: String, Identifiable, CaseIterable {
 
 enum ArrangementExport {
     static func write(_ chart: Chart, style: Style, title: String, format: ArrangementFormat,
-                      destination: URL, museScore: URL?) throws {
+                      destination: URL, museScore: URL?, soundFont: URL? = nil,
+                      library: URL? = nil, masterGain: Double = 0.8) throws {
         let arrangement = try renderArrangement(chart, style: style)
+        if format == .audio {
+            guard let soundFont, let library else { throw invalid("找不到音源，请重新安装伴奏工作台。") }
+            _ = try AudioRenderer.render(arrangement, soundFont: soundFont, library: library,
+                                         destination: destination, mix: chart.mix, masterGain: masterGain)
+            return
+        }
         if format == .guitarPro {
             try NotationExport.write(arrangement, title: title, to: destination)
             return

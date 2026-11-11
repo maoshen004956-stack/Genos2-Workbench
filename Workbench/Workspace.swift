@@ -22,8 +22,8 @@ struct StyleEntry: Identifiable {
     }
 }
 
-struct Draft: Codable {
-    struct Block: Codable, Identifiable {
+struct Draft: Codable, Equatable {
+    struct Block: Codable, Identifiable, Equatable {
         var id = UUID()
         var name: String
         var pattern: String
@@ -45,6 +45,8 @@ struct Draft: Codable {
     var key: SongKey?
     var meter: SongMeter?
     var mutedParts: Set<AccompanimentPart>?
+    var mix: [AccompanimentPart: PartMix]?
+    var soundFont: SoundFontReference?
     var blocks: [Block]
 
     static let demo = Draft(title: "天空流行编曲示例", blocks: [
@@ -82,7 +84,7 @@ func patternDisplayName(_ pattern: String) -> String {
 
 @MainActor
 final class Workspace: ObservableObject {
-    @Published var draft: Draft { didSet { stopPreview(); persist() } }
+    @Published var draft: Draft { didSet { draftChanged(from: oldValue) } }
     @Published private(set) var entries: [StyleEntry] = []
     @Published private(set) var style: Style?
     @Published var selectedBlock: UUID?
@@ -94,9 +96,16 @@ final class Workspace: ObservableObject {
     @Published private(set) var preview: PreviewState = .idle
     @Published private(set) var previewProgress = 0.0
     @Published private(set) var previewPosition: PreviewTimeline.Position?
+    @Published var soloPart: AccompanimentPart? { didSet { applyLiveMix() } }
+    @Published var masterGain = 0.8 {
+        didSet { player?.setMasterGain(masterGain); defaults.set(masterGain, forKey: "masterGain") }
+    }
+    @Published var importingSound = false
+    @Published private(set) var soundFonts: [SoundFontReference] = []
 
-    enum PreviewState { case idle, loading, playing }
-    private var player: AVMIDIPlayer?
+    enum PreviewState { case idle, loading, playing, paused }
+    private var player: FluidAudioPlayer?
+    private var activeTimeline: PreviewTimeline?
     private var previewTimer: Timer?
     private var previewToken: UUID?
 
@@ -116,6 +125,11 @@ final class Workspace: ObservableObject {
             .appendingPathComponent("Genos2 Workbench/Styles", isDirectory: true)
         draft = defaults.data(forKey: "arrangementDraft")
             .flatMap { try? JSONDecoder().decode(Draft.self, from: $0) } ?? .demo
+        soundFonts = defaults.data(forKey: "soundFonts")
+            .flatMap { try? JSONDecoder().decode([SoundFontReference].self, from: $0) }?.filter(\.isValid) ?? []
+        if let gain = defaults.object(forKey: "masterGain") as? Double, gain.isFinite {
+            masterGain = min(1, max(0, gain))
+        }
         if draft.title == "SkyPop 编曲示例", draft.stylePath == Draft.demo.stylePath { draft.title = Draft.demo.title }
         selectedBlock = draft.blocks.first(where: { $0.pattern.hasPrefix("Main") })?.id ?? draft.blocks.first?.id
         readLibrary()
@@ -156,6 +170,42 @@ final class Workspace: ObservableObject {
 
     private func persist() {
         if let data = try? JSONEncoder().encode(draft) { defaults.set(data, forKey: "arrangementDraft") }
+    }
+
+    private func draftChanged(from previous: Draft) {
+        var comparable = previous
+        comparable.mix = draft.mix
+        comparable.mutedParts = draft.mutedParts
+        comparable.title = draft.title
+        if comparable == draft { applyLiveMix() }
+        else { stopPreview() }
+        persist()
+    }
+
+    func partMix(_ part: AccompanimentPart) -> PartMix { draft.mix?[part] ?? PartMix() }
+
+    func setMix(_ part: AccompanimentPart, _ update: (inout PartMix) -> Void) {
+        var value = partMix(part)
+        update(&value)
+        var settings = draft.mix ?? [:]
+        settings[part] = value
+        draft.mix = settings
+    }
+
+    func resetMix() { draft.mix = nil; soloPart = nil }
+
+    func registerSoundFont(_ reference: SoundFontReference) {
+        soundFonts.append(reference)
+        if let data = try? JSONEncoder().encode(soundFonts) { defaults.set(data, forKey: "soundFonts") }
+    }
+
+    private func applyLiveMix() {
+        guard let player else { return }
+        for part in AccompanimentPart.allCases { player.setMix(partMix(part), for: part) }
+        var muted = draft.mutedParts ?? []
+        if let soloPart { muted.formUnion(AccompanimentPart.allCases.filter { $0 != soloPart }) }
+        player.setMutedParts(muted)
+        if let failure = player.errorMessage { stopPreview(); message = failure }
     }
 
     private func readLibrary() {
@@ -270,6 +320,7 @@ final class Workspace: ObservableObject {
         if style != nil, entry.path == draft.stylePath { return }
         do {
             let newStyle = try Style(url: entry.url)
+            soloPart = nil
             let oldMeter = meter
             let newMeter = draft.meter ?? SongMeter(newStyle)
             if let previous = oldMeter { adaptChordTiming(from: previous, to: newMeter, style: newStyle) }
@@ -388,6 +439,7 @@ final class Workspace: ObservableObject {
 
     func replaceDraft(_ value: Draft, selection: UUID?, undoManager: UndoManager?) {
         let previous = draft, previousSelection = selectedBlock
+        soloPart = nil
         draft = value
         selectedBlock = selection ?? value.blocks.first?.id
         selectedBar = 0
@@ -398,6 +450,7 @@ final class Workspace: ObservableObject {
     }
 
     func newDraft() {
+        soloPart = nil
         let first = patterns.first { $0 == "Main A" } ?? patterns.first ?? "Main A"
         let tonic = key.tonicName + (key.minor ? "m" : "")
         let block = Draft.Block(name: "主歌", pattern: first, bars: Array(repeating: tonic, count: 4))
@@ -564,29 +617,96 @@ final class Workspace: ObservableObject {
         for segment in segments { _ = try PlannedSegment(entry: segment, style: style, meter: meter) }
         guard !enabledParts.isEmpty else { throw invalid("请至少选择一个当前编曲中使用的乐器声部。") }
         return Chart(style: draft.stylePath, bpm: bpm, key: key, meter: meter,
-                     mutedParts: draft.mutedParts ?? [], segments: segments)
+                     mutedParts: draft.mutedParts ?? [], mix: draft.mix ?? [:], segments: segments)
     }
 
     func togglePreview() {
-        guard preview == .idle else { stopPreview(); return }
+        if preview == .loading { stopPreview(); return }
+        if preview == .playing { player?.pause(); preview = .paused; return }
+        if preview == .paused {
+            do { try player?.play(); preview = .playing }
+            catch { stopPreview(); message = error.localizedDescription }
+            return
+        }
+        startPreview(at: 0)
+    }
+
+    func playFromSelection() {
+        guard let block = current, let meter else { return }
+        let preceding = draft.blocks.prefix { $0.id != block.id }.reduce(0) { $0 + count($1) }
+        let bpm = Double(draft.bpm) ?? style?.bpm ?? 120
+        let seconds = Double(preceding + min(selectedBar, count(block) - 1)) * Double(meter.beats) * 4 / Double(meter.unit) * 60 / bpm
+        if let player {
+            player.seek(to: seconds)
+            do { try player.play(); preview = .playing; followPreview(activeTimeline?.position(at: seconds)) }
+            catch { stopPreview(); message = error.localizedDescription }
+        } else { startPreview(at: seconds) }
+    }
+
+    func seekPreview(_ fraction: Double) {
+        guard let player, let timeline = activeTimeline else { return }
+        let time = min(1, max(0, fraction)) * max(0, timeline.duration - 0.001)
+        player.seek(to: time)
+        if let failure = player.errorMessage { stopPreview(); message = failure; return }
+        previewProgress = fraction
+        followPreview(timeline.position(at: time))
+    }
+
+    private func startPreview(at seconds: Double) {
         guard let style else { return }
         do {
-            let chart = try makeChart(style: style)
+            var chart = try makeChart(style: style)
+            // Keep all parts and the original style controls available for live mixing.
+            chart.mix = [:]
+            chart.mutedParts = []
             let sectionIDs = draft.blocks.map(\.id)
+            let font = soundFontURL
+            let library = SoundSources.libraryURL
+            let gain = masterGain
             let token = UUID()
             previewToken = token
             preview = .loading
-            Task {
+            Task { [self] in
                 do {
-                    let rendered = try await withCheckedThrowingContinuation {
-                        (result: CheckedContinuation<ArrangementResult, Error>) in
+                    let (audio, rendered) = try await withCheckedThrowingContinuation {
+                        (result: CheckedContinuation<(FluidAudioPlayer, ArrangementResult), Error>) in
                         DispatchQueue.global(qos: .userInitiated).async {
-                            result.resume(with: Result { try renderArrangement(chart, style: style) })
+                            result.resume(with: Result {
+                                let rendered = try renderArrangement(chart, style: style)
+                                let audio = try FluidAudioPlayer(arrangement: rendered, soundFont: font, library: library,
+                                                                masterGain: gain)
+                                return (audio, rendered)
+                            })
                         }
                     }
-                    guard previewToken == token else { return }
+                    guard previewToken == token else { audio.stop(); return }
                     let timeline = PreviewTimeline(arrangement: rendered, chart: chart, sectionIDs: sectionIDs)
-                    try play(rendered.midi, timeline: timeline, token: token)
+                    player = audio
+                    activeTimeline = timeline
+                    applyLiveMix()
+                    guard previewToken == token else { audio.stop(); return }
+                    audio.setMasterGain(masterGain)
+                    audio.seek(to: seconds)
+                    try audio.play()
+                    preview = .playing
+                    followPreview(timeline.position(at: seconds))
+                    let timer = Timer(timeInterval: 0.05, repeats: true) { [weak self] _ in
+                        Task { @MainActor in
+                            guard let self, self.previewToken == token, let player = self.player,
+                                  self.preview == .playing else { return }
+                            if !player.isPlaying {
+                                let failure = player.errorMessage
+                                self.stopPreview()
+                                if let failure { self.message = failure }
+                                return
+                            }
+                            let time = player.position
+                            self.previewProgress = min(1, time / timeline.duration)
+                            self.followPreview(timeline.position(at: time))
+                        }
+                    }
+                    previewTimer = timer
+                    RunLoop.main.add(timer, forMode: .common)
                 } catch {
                     guard previewToken == token else { return }
                     stopPreview()
@@ -594,30 +714,6 @@ final class Workspace: ObservableObject {
                 }
             }
         } catch { message = error.localizedDescription }
-    }
-
-    private func play(_ midi: Data, timeline: PreviewTimeline, token: UUID) throws {
-        let player = try AVMIDIPlayer(data: midi, soundBankURL: nil)
-        player.prepareToPlay()
-        self.player = player
-        preview = .playing
-        followPreview(timeline.position(at: 0))
-        let timer = Timer(timeInterval: 0.05, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                guard let self, self.previewToken == token, let player = self.player else { return }
-                let time = player.currentPosition
-                let progress = min(1, time / timeline.duration)
-                if progress - self.previewProgress >= 0.002 { self.previewProgress = progress }
-                self.followPreview(timeline.position(at: time))
-            }
-        }
-        previewTimer = timer
-        RunLoop.main.add(timer, forMode: .common)
-        player.play { [weak self] in
-            Task { @MainActor in
-                if self?.previewToken == token { self?.stopPreview() }
-            }
-        }
     }
 
     private func followPreview(_ position: PreviewTimeline.Position?) {
@@ -636,6 +732,7 @@ final class Workspace: ObservableObject {
         previewTimer = nil
         player?.stop()
         player = nil
+        activeTimeline = nil
         previewPosition = nil
         previewProgress = 0
         preview = .idle
@@ -648,6 +745,9 @@ final class Workspace: ObservableObject {
             let projectTitle = title.isEmpty ? "未命名编曲" : title
             let safeTitle = projectTitle.replacingOccurrences(of: "/", with: "／")
             let chart = try makeChart(style: style)
+            let soundFont = soundFontURL
+            let soundLibrary = SoundSources.libraryURL
+            let gain = masterGain
             let museScore = NSWorkspace.shared.urlForApplication(withBundleIdentifier: ArrangementFormat.museScore.bundleID)
             if format == .museScore && museScore == nil { throw invalid("请先安装 MuseScore Studio，再导出 .mscz 工程。") }
 
@@ -669,7 +769,8 @@ final class Workspace: ObservableObject {
                         DispatchQueue.global(qos: .userInitiated).async {
                             result.resume(with: Result {
                                 try ArrangementExport.write(chart, style: style, title: projectTitle, format: format,
-                                                            destination: destination, museScore: museScore)
+                                                            destination: destination, museScore: museScore,
+                                                            soundFont: soundFont, library: soundLibrary, masterGain: gain)
                             })
                         }
                     }
@@ -680,6 +781,7 @@ final class Workspace: ObservableObject {
     }
 
     func openExport(_ file: Exported) {
+        if file.format == .audio { NSWorkspace.shared.open(file.url); return }
         guard let app = NSWorkspace.shared.urlForApplication(withBundleIdentifier: file.format.bundleID) else {
             message = "找不到 \(file.format.title)。文件已保存。"
             return

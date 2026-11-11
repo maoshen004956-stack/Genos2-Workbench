@@ -1,0 +1,28 @@
+#!/bin/sh
+set -eu
+folder=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+. "$folder/style-library.sh"
+audio="$folder/AudioRuntime"
+if [ ! -f "$audio/libfluidsynth.3.dylib" ]; then "$folder/prepare-sound-runtime" "$audio"; fi
+build=$(mktemp -d "${TMPDIR:-/tmp}/genos2-audio-tests.XXXXXXXX")
+trap 'rm -rf "$build"' EXIT
+target="$(uname -m)-apple-macosx14.0"
+swiftc -target "$target" -module-cache-path "$build/modules" -emit-library -static -emit-module \
+    -module-name SXCore "$folder"/Sources/SXCore/*.swift -o "$build/libSXCore.a"
+
+for test in VerifyMix VerifyFluid VerifyAudio; do
+    app="$build/$test.app"
+    mkdir -p "$app/Contents/MacOS" "$app/Contents/Frameworks" "$app/Contents/Resources/SoundFonts"
+    cp "$audio/libfluidsynth.3.dylib" "$app/Contents/Frameworks/"
+    cp "$audio/GeneralUser-GS.sf2" "$app/Contents/Resources/SoundFonts/"
+    ditto "$style_library" "$app/Contents/Resources/Genos2"
+    cp "$folder/Workbench/StyleNames.zh-Hans.tsv" "$app/Contents/Resources/"
+    set -- "$folder/Sources/SXAudio/YamahaVoices.swift" "$folder/Instruments.swift" "$folder/Arrangement.swift"
+    for source in "$folder"/Workbench/*.swift; do
+        case "$source" in */WorkbenchApp.swift|*/IRealImportView.swift) continue ;; esac
+        set -- "$@" "$source"
+    done
+    swiftc -target "$target" -module-cache-path "$build/modules" -I "$build" -L "$build" -lSXCore \
+        "$@" "$folder/Tests/$test.swift" -o "$app/Contents/MacOS/check"
+    "$app/Contents/MacOS/check" "$audio/GeneralUser-GS.sf2" "$audio/libfluidsynth.3.dylib" "$style_library"
+done

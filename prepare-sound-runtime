@@ -1,0 +1,112 @@
+#!/bin/sh
+set -eu
+
+# Builds a redistributable SoundFont runtime without Homebrew runtime dependencies.
+# Requirements: macOS, Xcode command line tools, CMake, curl, Python 3.
+folder=$(CDPATH='' cd -- "$(dirname -- "$0")" && pwd)
+destination=${1:-"$folder/AudioRuntime"}
+mkdir -p "$destination"
+destination=$(CDPATH='' cd -- "$destination" && pwd)
+build=$(mktemp -d "${TMPDIR:-/tmp}/genos2-sound-build.XXXXXXXX")
+trap 'rm -rf "$build"' EXIT
+mkdir -p "$destination/Licenses" "$destination/Sources"
+
+verify() {
+    actual=$(shasum -a 256 "$1" | cut -d ' ' -f 1)
+    if [ "$actual" != "$2" ]; then
+        printf 'Checksum mismatch: %s\n' "$1" >&2
+        exit 1
+    fi
+}
+fetch() {
+    if [ ! -f "$2" ]; then
+        curl --fail --location --retry 3 "$1" -o "$2.download"
+        mv "$2.download" "$2"
+    fi
+    verify "$2" "$3"
+}
+
+fluid="$destination/Sources/fluidsynth-2.6.2.tar.gz"
+gcem="$destination/Sources/gcem-012ae73c6d0a2cb09ffe86475f5c6fba3926e200.zip"
+fetch 'https://codeload.github.com/FluidSynth/fluidsynth/tar.gz/refs/tags/v2.6.2' "$fluid" \
+    ca376b42a3c1b186a4c8c248931789a455ac94a89b777394969d678010c2f91f
+fetch 'https://github.com/kthohr/gcem/archive/012ae73c6d0a2cb09ffe86475f5c6fba3926e200.zip' "$gcem" \
+    28159274c54e9640354852e172d10d88eb159f4e7f2fea42edbcd20105ed3526
+font_base='https://raw.githubusercontent.com/mrbumpy409/GeneralUser-GS/684543d5e5efaef08d02be50dcda8d552478fa60'
+fetch "$font_base/GeneralUser-GS.sf2" "$destination/GeneralUser-GS.sf2" \
+    9575028c7a1f589f5770fccc8cff2734566af40cd26ed836944e9a5152688cfe
+
+tar -xzf "$fluid" -C "$build"
+ditto -x -k "$gcem" "$build"
+source="$build/fluidsynth-2.6.2"
+gcem_source="$build/gcem-012ae73c6d0a2cb09ffe86475f5c6fba3926e200"
+cmake -S "$source" -B "$build/build" \
+    -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_DEPLOYMENT_TARGET=14.0 \
+    -DCMAKE_OSX_ARCHITECTURES="${GENOS_AUDIO_ARCH:-$(uname -m)}" \
+    -DGCEM_INCLUDE_DIR="$gcem_source/include" -Denable-framework=OFF \
+    -Denable-coreaudio=OFF -Denable-coremidi=OFF -Denable-aufile=OFF \
+    -Denable-libsndfile=OFF -Denable-network=OFF -Denable-dbus=OFF \
+    -Denable-ladspa=OFF -Denable-alsa=OFF -Denable-jack=OFF -Denable-oss=OFF \
+    -Denable-dsound=OFF -Denable-wasapi=OFF -Denable-waveout=OFF -Denable-winmidi=OFF \
+    -Denable-sdl3=OFF -Denable-pulseaudio=OFF -Denable-pipewire=OFF \
+    -Denable-readline=OFF -Denable-openmp=OFF -Denable-native-dls=OFF -Denable-signalsmith=OFF
+cmake --build "$build/build" --target libfluidsynth -j "${GENOS_AUDIO_JOBS:-4}"
+cp -L "$build/build/src/libfluidsynth.3.dylib" "$destination/libfluidsynth.3.dylib"
+install_name_tool -id '@loader_path/libfluidsynth.3.dylib' "$destination/libfluidsynth.3.dylib"
+codesign --force --sign - "$destination/libfluidsynth.3.dylib"
+
+cp "$source/LICENSE" "$destination/Licenses/FluidSynth-LICENSE.txt"
+cp "$source/AUTHORS" "$destination/Licenses/FluidSynth-AUTHORS.txt"
+cp "$gcem_source/LICENSE" "$destination/Licenses/GCEM-LICENSE.txt"
+cp "$gcem_source/NOTICE.txt" "$destination/Licenses/GCEM-NOTICE.txt"
+for document in LICENSE.txt README.md; do
+    file="$destination/Licenses/GeneralUser-GS-$document"
+    if [ ! -f "$file" ]; then curl --fail --location --retry 3 "$font_base/documentation/$document" -o "$file"; fi
+done
+if ! cmp -s "$0" "$destination/Sources/prepare-sound-runtime"; then
+    cp "$0" "$destination/Sources/prepare-sound-runtime"
+fi
+cat > "$destination/SOURCES.md" <<'NOTICE'
+# Audio runtime sources and licenses
+
+- FluidSynth 2.6.2: https://github.com/FluidSynth/fluidsynth (LGPL 2.1 or later).
+- GCEM commit 012ae73c6d0a2cb09ffe86475f5c6fba3926e200: https://github.com/kthohr/gcem (Apache 2.0).
+- GeneralUser GS 2.0.3 by S. Christian Collins, repository commit 684543d5e5efaef08d02be50dcda8d552478fa60:
+  https://github.com/mrbumpy409/GeneralUser-GS (GeneralUser GS License 2.0).
+  SoundFont homepage: https://schristiancollins.com/generaluser.php
+
+Complete licenses, attribution, original sample provenance statement and
+SoundFont documentation are in Licenses/. The original FluidSynth and GCEM
+source archives and this build script are in Sources/. No source patches or
+SoundFont modifications were made. The script changes the dylib install ID
+to @loader_path and applies an ad-hoc signature.
+
+The runtime supports standard SF2 files. External audio/MIDI drivers, network,
+native DLS, compressed SF3 and optional external effect dependencies are disabled.
+The C++11 platform abstraction avoids a GLib dependency. Only macOS system
+libraries are linked; user machines do not need Homebrew or an internet connection.
+
+Rebuild with Sources/prepare-sound-runtime OUTPUT_DIRECTORY, Xcode command line
+tools, CMake and Python 3. Included downloads are reused when present and verified
+with pinned SHA-256 checksums in the script. Architecture defaults to the current
+machine (override with GENOS_AUDIO_ARCH); deployment target is macOS 14.0.
+The app dynamically loads the library and permits an ABI-compatible replacement.
+After replacing a library in an app bundle, its local code signature must be renewed.
+
+Download SHA-256:
+
+- fluidsynth-2.6.2.tar.gz: ca376b42a3c1b186a4c8c248931789a455ac94a89b777394969d678010c2f91f
+- gcem-012ae73c6d0a2cb09ffe86475f5c6fba3926e200.zip: 28159274c54e9640354852e172d10d88eb159f4e7f2fea42edbcd20105ed3526
+- GeneralUser-GS.sf2: 9575028c7a1f589f5770fccc8cff2734566af40cd26ed836944e9a5152688cfe
+NOTICE
+
+# No non-system dylib is permitted: the installed app works without Homebrew.
+python3 - "$destination/libfluidsynth.3.dylib" <<'PY'
+import subprocess, sys
+dependencies = subprocess.check_output(['otool', '-L', sys.argv[1]], text=True).splitlines()[2:]
+for line in dependencies:
+    path = line.strip().split(' (', 1)[0]
+    if not path.startswith('/usr/lib/') and not path.startswith('/System/Library/'):
+        raise SystemExit('Unexpected external runtime dependency: ' + path)
+PY
+printf 'Prepared SoundFont runtime: %s\n' "$destination"

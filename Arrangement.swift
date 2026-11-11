@@ -106,15 +106,17 @@ struct Chart {
     var key: SongKey?
     var meter: SongMeter?
     var mutedParts: Set<AccompanimentPart> = []
+    var mix: [AccompanimentPart: PartMix] = [:]
     var segments: [Segment] = []
 
     init(style: String, bpm: Double?, key: SongKey? = nil, meter: SongMeter? = nil,
-         mutedParts: Set<AccompanimentPart> = [], segments: [Segment]) {
+         mutedParts: Set<AccompanimentPart> = [], mix: [AccompanimentPart: PartMix] = [:], segments: [Segment]) {
         self.style = style
         self.bpm = bpm
         self.key = key
         self.meter = meter
         self.mutedParts = mutedParts
+        self.mix = mix
         self.segments = segments
     }
 
@@ -300,19 +302,34 @@ struct PerformanceTrack {
     private var bankMSB: UInt8
     private var bankLSB: UInt8
     private var drumVoice: Style.VoiceAddress
+    private let mix: PartMix
+    private let guitar: Bool
     var isDrum: Bool { part.isDrum }
     var channel: UInt8 { part.channel }
 
-    init(part: AccompanimentPart, style: Style) {
+    init(part: AccompanimentPart, style: Style, mix: PartMix = .init()) {
         self.part = part
-        name = part.name + " · " + part.instrumentName(in: style)
-        program = part.program(in: style)
+        self.mix = mix
+        guitar = style.guitarChannels.contains(part.rawValue)
+        let selectedProgram = mix.program ?? part.program(in: style)
+        program = selectedProgram
+        let instrument = part.isDrum
+            ? generalMIDIDrumKits.first(where: { $0.program == selectedProgram })?.name ?? "鼓组"
+            : generalMIDIInstrumentNames[Int(selectedProgram)]
+        name = part.name + " · " + instrument
         let voice = part.voice(in: style)
         bankMSB = voice.msb
         bankLSB = voice.lsb
         drumVoice = voice
-        if !isDrum {
-            add(MIDI(0xc0 | channel, program), at: 0)
+        add(MIDI(0xc0 | channel, program), at: 0)
+        let setup = style.initialControllers[part.rawValue] ?? [:]
+        // Yamaha bank/NRPN/DSP parameters cannot be sent blindly to a GM synth.
+        // Preserve portable expression and tone controls, followed by mixer overrides.
+        for control: UInt8 in [1, 7, 10, 11, 64, 71, 72, 73, 74, 91, 93] {
+            let fallback: UInt8? = control == 7 ? 100 : control == 10 ? 64 : control == 11 ? 127 : nil
+            if let value = override(control) ?? setup[control] ?? fallback {
+                add(MIDI(0xb0 | channel, control, value), at: 0)
+            }
         }
     }
 
@@ -335,10 +352,28 @@ struct PerformanceTrack {
             }
         case 0xb0 where midi.data1 == 0: bankMSB = midi.data2
         case 0xb0 where midi.data1 == 32: bankLSB = midi.data2
-        case 0xc0 where isDrum: drumVoice = .init(msb: bankMSB, lsb: bankLSB, program: midi.data1)
-        case 0xb0, 0xd0, 0xe0:
-            if !isDrum { add(midi.onChannel(channel), at: tick) }
+        case 0xc0:
+            let voice = Style.VoiceAddress(msb: bankMSB, lsb: bankLSB, program: midi.data1)
+            if isDrum { drumVoice = voice }
+            if mix.program == nil {
+                let gm = isDrum ? YamahaVoices.drumProgram(voice)
+                    : YamahaVoices.melodicProgram(voice, guitar: guitar, bass: part == .bass)
+                add(MIDI(0xc0 | channel, gm), at: tick)
+            }
+        case 0xb0:
+            add(MIDI(0xb0 | channel, midi.data1, override(midi.data1) ?? midi.data2), at: tick)
+        case 0xd0, 0xe0:
+            add(midi.onChannel(channel), at: tick)
         default: break
+        }
+    }
+
+    private func override(_ control: UInt8) -> UInt8? {
+        switch control {
+        case 7: return mix.volume
+        case 10: return mix.pan
+        case 91: return mix.reverb
+        default: return nil
         }
     }
 
@@ -388,10 +423,11 @@ func encodeMIDI(ppq: Int, meter: SongMeter, key: SongKey?, bpm: Double, duration
     let header = [0, 1] + bigEndian(tracks.count + 1, bytes: 2) + bigEndian(ppq, bytes: 2)
     var file = Data(chunk("MThd", header))
     file.append(contentsOf: chunk("MTrk", conductor))
-    for track in tracks {
+    let encodedEvents = portableMIDIEvents(tracks)
+    for (index, track) in tracks.enumerated() {
         var payload = [0] + textEvent(0x03, track.name)
         previous = 0
-        for event in track.events {
+        for event in encodedEvents[index] {
             let midi = event.midi
             payload += vlq(event.tick - previous) + [midi.status, midi.data1]
             if midi.size == 3 { payload.append(midi.data2) }
@@ -401,6 +437,72 @@ func encodeMIDI(ppq: Int, meter: SongMeter, key: SongKey?, bpm: Double, duration
         file.append(contentsOf: chunk("MTrk", payload))
     }
     return file
+}
+
+/// Standard GM has one percussion channel. Independent drum kits, pan and effects
+/// remain intact in PerformanceTrack for the audio renderer. When both rhythm
+/// parts are exported as GM MIDI, use a shared standard kit and fold each part's
+/// volume/expression into note velocity instead of sending conflicting controllers.
+func portableMIDIEvents(_ tracks: [PerformanceTrack]) -> [[Style.Event]] {
+    let drums = tracks.indices.filter { tracks[$0].isDrum }
+    guard drums.count > 1 else { return tracks.map(\.events) }
+    var output = tracks.map(\.events)
+    for index in drums {
+        var volume = 100, expression = 127
+        var sounding: Set<UInt8> = []
+        var events: [Style.Event] = []
+        if index == drums.first {
+            for midi in [MIDI(0xc9, 0), MIDI(0xb9, 7, 127), MIDI(0xb9, 11, 127),
+                         MIDI(0xb9, 10, 64), MIDI(0xb9, 91, 40), MIDI(0xb9, 93, 0)] {
+                events.append(.init(tick: 0, midi: midi))
+            }
+        }
+        for event in tracks[index].events {
+            let midi = event.midi
+            switch midi.kind {
+            case 0xb0 where midi.data1 == 7: volume = Int(midi.data2)
+            case 0xb0 where midi.data1 == 11: expression = Int(midi.data2)
+            case 0x90 where midi.data2 > 0:
+                let velocity = UInt8((Double(midi.data2) * Double(volume * expression) / (127 * 127)).rounded())
+                if velocity > 0 {
+                    sounding.insert(midi.data1)
+                    events.append(.init(tick: event.tick, midi: MIDI(0x99, midi.data1, velocity)))
+                }
+            case 0x80, 0x90:
+                if sounding.remove(midi.data1) != nil { events.append(.init(tick: event.tick, midi: MIDI(0x89, midi.data1))) }
+            default: break
+            }
+        }
+        output[index] = events
+    }
+
+    // A note-off from one rhythm part must not end the other part's overlapping
+    // note on the shared channel. Evaluate all releases/attacks at each tick
+    // together because a MIDI player may merge simultaneous track events in any order.
+    struct Item { let track: Int; let event: Int; let midi: MIDI }
+    var byTick: [Int: [Item]] = [:]
+    for track in drums {
+        for (index, event) in output[track].enumerated() where event.midi.kind == 0x80 || event.midi.kind == 0x90 {
+            byTick[event.tick, default: []].append(.init(track: track, event: index, midi: event.midi))
+        }
+    }
+    var owners: [UInt8: Set<Int>] = [:]
+    var removed: [Int: Set<Int>] = [:]
+    for tick in byTick.keys.sorted() {
+        let events = byTick[tick]!
+        for item in events where item.midi.kind == 0x80 { owners[item.midi.data1, default: []].remove(item.track) }
+        for item in events where item.midi.kind == 0x90 { owners[item.midi.data1, default: []].insert(item.track) }
+        var released: Set<UInt8> = []
+        for item in events where item.midi.kind == 0x80 {
+            if !(owners[item.midi.data1]?.isEmpty ?? true) || !released.insert(item.midi.data1).inserted {
+                removed[item.track, default: []].insert(item.event)
+            }
+        }
+    }
+    for track in drums {
+        output[track] = output[track].enumerated().compactMap { removed[track]?.contains($0.offset) == true ? nil : $0.element }
+    }
+    return output
 }
 
 struct ArrangementResult {
@@ -424,6 +526,7 @@ struct ArrangementResult {
 func renderArrangement(_ chart: Chart, style: Style) throws -> ArrangementResult {
     guard style.ticksPerBar > 0 else { throw invalid("Style 的小节时值无效") }
     guard !chart.segments.isEmpty else { throw invalid("请先添加段落") }
+    guard chart.mix.values.allSatisfy(\.isValid) else { throw invalid("乐器与混音设置必须在 0–127 之间。") }
     let meter = chart.meter ?? SongMeter(style)
     let songBarTicks = meter.ticks(style.ticksPerQuarter)
     let plan = try chart.segments.map { try PlannedSegment(entry: $0, style: style, meter: meter) }
@@ -435,7 +538,7 @@ func renderArrangement(_ chart: Chart, style: Style) throws -> ArrangementResult
     var arranger = Arranger(style: style)
     let enabled = Set(AccompanimentPart.allCases).subtracting(chart.mutedParts)
     guard !enabled.isEmpty else { throw invalid("请至少选择一个要输出的乐器声部。") }
-    var tracks = AccompanimentPart.allCases.map { PerformanceTrack(part: $0, style: style) }
+    var tracks = AccompanimentPart.allCases.map { PerformanceTrack(part: $0, style: style, mix: chart.mix[$0] ?? .init()) }
     var start = 0
     var markers: [(Int, String)] = []
     var harmony: [(Int, Chord)] = []

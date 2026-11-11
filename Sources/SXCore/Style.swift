@@ -97,6 +97,8 @@ public struct Style {
     public let oneTouchSettings: [OneTouchSetting]
     public let id: String
     public let voices: [UInt8: VoiceAddress]
+    /// Channel setup before the first style section (mix, expression and effects).
+    public let initialControllers: [UInt8: [UInt8: UInt8]]
     public let name: String
     public let ticksPerQuarter: Int
     public let beatsPerBar: Int
@@ -219,6 +221,7 @@ public struct Style {
         var sections: [Section] = []
         var programs: [UInt8: UInt8] = [:]
         var voices: [UInt8: VoiceAddress] = [:]
+        var initialControllers: [UInt8: [UInt8: UInt8]] = [:]
         var msb: [UInt8: UInt8] = [:]
         var lsb: [UInt8: UInt8] = [:]
         var events: [Event] = []
@@ -302,6 +305,7 @@ public struct Style {
                     voices[midi.channel] = VoiceAddress(msb: msb[midi.channel, default: 0],
                                                        lsb: lsb[midi.channel, default: 0], program: a)
                 } else if kind == 0xb0 {
+                    initialControllers[midi.channel, default: [:]][a] = b
                     if a == 0 { msb[midi.channel] = b }
                     if a == 32 { lsb[midi.channel] = b }
                 }
@@ -314,6 +318,7 @@ public struct Style {
         }
         id = SHA256.hash(data: data).map { String(format: "%02x", $0) }.joined()
         self.voices = voices
+        self.initialControllers = initialControllers
         self.oneTouchSettings = ots
         self.name = name
         ticksPerQuarter = division

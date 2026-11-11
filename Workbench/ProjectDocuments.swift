@@ -60,7 +60,7 @@ extension Workspace {
         let project: SongProject
         do { project = try JSONDecoder().decode(SongProject.self, from: data) }
         catch { throw invalid("无法读取歌曲工程，文件格式不正确或内容不完整。") }
-        guard project.version == 1 else { throw invalid("暂不支持这个歌曲工程版本，请更新伴奏工作台。") }
+        guard (1...2).contains(project.version) else { throw invalid("暂不支持这个歌曲工程版本，请更新伴奏工作台。") }
         try validateProject(project.draft)
         replaceDraft(project.draft, selection: project.draft.blocks.first?.id, undoManager: undoManager)
         exported = nil
@@ -72,12 +72,16 @@ extension Workspace {
         try validateProject(draft)
         let encoder = JSONEncoder()
         encoder.outputFormatting = [.prettyPrinted, .sortedKeys]
-        let data = try encoder.encode(SongProject(version: 1, draft: draft))
+        let data = try encoder.encode(SongProject(version: 2, draft: draft))
         guard data.count <= SongProject.maximumBytes else { throw invalid("歌曲工程不能超过 8 MB。") }
         return data
     }
 
     private func validateProject(_ candidate: Draft) throws {
+        guard (candidate.mix ?? [:]).values.allSatisfy(\.isValid) else {
+            throw invalid("工程中的乐器或混音数值无效，请使用 0–127 的 MIDI 范围。")
+        }
+        if let font = candidate.soundFont, !font.isValid { throw invalid("工程中的音源引用无效。") }
         if let key = candidate.key, !(-7...7).contains(key.fifths) {
             throw invalid("歌曲工程中的调号无效。")
         }

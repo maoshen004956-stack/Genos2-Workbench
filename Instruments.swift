@@ -1,5 +1,20 @@
 import SXCore
 
+struct PartMix: Codable, Equatable {
+    var program: UInt8? = nil
+    var volume: UInt8? = nil
+    var pan: UInt8? = nil
+    var reverb: UInt8? = nil
+
+    var isValid: Bool { [program, volume, pan, reverb].compactMap { $0 }.allSatisfy { $0 < 128 } }
+    var isDefault: Bool { program == nil && volume == nil && pan == nil && reverb == nil }
+}
+
+let generalMIDIDrumKits: [(program: UInt8, name: String)] = [
+    (0, "标准鼓组"), (8, "房间鼓组"), (16, "强力鼓组"), (24, "电子鼓组"), (25, "808 鼓组"),
+    (32, "爵士鼓组"), (40, "鼓刷鼓组"), (48, "管弦打击乐"), (56, "音效打击乐")
+]
+
 enum AccompanimentPart: UInt8, CaseIterable, Codable, Identifiable {
     case rhythm1 = 8, rhythm2, bass, chord1, chord2, pad, phrase1, phrase2
 
@@ -25,7 +40,7 @@ enum AccompanimentPart: UInt8, CaseIterable, Codable, Identifiable {
     }
 
     func program(in style: Style) -> UInt8 {
-        isDrum ? 0 : YamahaVoices.melodicProgram(voice(in: style),
+        isDrum ? YamahaVoices.drumProgram(voice(in: style)) : YamahaVoices.melodicProgram(voice(in: style),
                                                   guitar: style.guitarChannels.contains(rawValue), bass: self == .bass)
     }
 
@@ -36,7 +51,7 @@ enum AccompanimentPart: UInt8, CaseIterable, Codable, Identifiable {
 }
 
 // General MIDI Level 1 program order, zero-based as stored in MIDI messages.
-private let generalMIDIInstrumentNames = [
+let generalMIDIInstrumentNames = [
     "三角钢琴", "明亮钢琴", "电三角钢琴", "酒吧钢琴", "电钢琴 1", "电钢琴 2", "羽管键琴", "击弦古钢琴",
     "钢片琴", "钟琴", "八音盒", "颤音琴", "马林巴", "木琴", "管钟", "扬琴",
     "拉杆风琴", "打击式风琴", "摇滚风琴", "教堂管风琴", "簧风琴", "手风琴", "口琴", "探戈手风琴",

@@ -17,7 +17,7 @@ for test in IRealImportTests VerifyProject; do
     cp "$style_library/pop/SkyPop.T547.prs" "$app/Contents/Resources/Genos2/pop/"
     set -- "$folder/Sources/SXAudio/YamahaVoices.swift" "$folder/Instruments.swift" "$folder/Arrangement.swift"
     for source in "$folder"/Workbench/*.swift; do
-        case "$source" in */WorkbenchApp.swift|*/IRealImportView.swift) continue ;; esac
+        case "$source" in */WorkbenchApp.swift|*/IRealImportView.swift|*/SoundMixerView.swift) continue ;; esac
         set -- "$@" "$source"
     done
     swiftc -target "$target" -module-cache-path "$build/modules" -I "$build" -L "$build" -lSXCore \

@@ -184,6 +184,7 @@ private struct WorkbenchView: View {
             Text("当前草稿将由新编曲替换。")
         }
         .sheet(isPresented: $showPaste) { pastePanel }
+        .sheet(isPresented: $showInstruments) { SoundMixerView(workspace: workspace) }
         .sheet(item: $workspace.pendingIRealImport) { batch in
             IRealImportView(batch: batch, workspace: workspace, undoManager: undoManager)
         }
@@ -499,8 +500,8 @@ private struct WorkbenchView: View {
                 editingBar = nil
                 workspace.togglePreview()
             } label: {
-                Label(workspace.preview == .idle ? "试听" : workspace.preview == .loading ? "取消" : "停止",
-                      systemImage: workspace.preview == .idle ? "play.fill" : "stop.fill")
+                Label(workspace.preview == .playing ? "暂停" : workspace.preview == .loading ? "取消" : workspace.preview == .paused ? "继续" : "试听",
+                      systemImage: workspace.preview == .playing ? "pause.fill" : "play.fill")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(violet)
                     .padding(.horizontal, 12)
@@ -508,8 +509,11 @@ private struct WorkbenchView: View {
                     .background(violetTint, in: RoundedRectangle(cornerRadius: 9))
             }
             .buttonStyle(.plain)
-            .disabled(workspace.enabledParts.isEmpty)
-            .help("用本机音源试听整曲伴奏")
+            .disabled(workspace.preview == .idle && workspace.enabledParts.isEmpty)
+            .help("用内置音源试听；可在音色与混音中边听边调")
+            Button { workspace.stopPreview() } label: { Image(systemName: "stop.fill") }
+                .buttonStyle(.plain).foregroundStyle(muted)
+                .disabled(workspace.preview == .idle).help("停止试听")
 
             Button {
                 showExport.toggle()
@@ -588,11 +592,14 @@ private struct WorkbenchView: View {
                     .foregroundStyle(muted)
                 Spacer()
                 Button { showInstruments = true } label: {
-                    Label("乐器 \(enabled)/\(available.count)", systemImage: "slider.horizontal.3")
+                    Label("音色与混音 \(enabled)/\(available.count)", systemImage: "slider.horizontal.3")
                 }
                 .disabled(workspace.style == nil)
-                .help("选择参加试听和导出的乐器声部")
-                .popover(isPresented: $showInstruments) { instrumentPicker }
+                .help("选择音色，边听边调音量、声像和混响")
+
+                Button { workspace.playFromSelection() } label: {
+                    Image(systemName: "play.square")
+                }.help("从所选小节试听").disabled(workspace.current == nil || workspace.preview == .loading || workspace.enabledParts.isEmpty)
                 Button { showDemo = true } label: {
                     Label("风格示例", systemImage: "music.note.list")
                 }
@@ -617,12 +624,12 @@ private struct WorkbenchView: View {
             }
             if let position = workspace.previewPosition {
                 HStack(spacing: 10) {
-                    Text("试听中 · 第 \(position.barNumber) 小节 · \(position.chord ?? "–")")
+                    Text("\(workspace.preview == .paused ? "已暂停" : "试听中") · 第 \(position.barNumber) 小节 · \(position.chord ?? "–")")
                         .font(.system(size: 11, weight: .semibold))
                         .foregroundStyle(violet)
-                    ProgressView(value: workspace.previewProgress)
+                    Slider(value: Binding(get: { workspace.previewProgress }, set: { workspace.seekPreview($0) }), in: 0...1)
                         .tint(violet)
-                        .accessibilityLabel("试听进度")
+                        .accessibilityLabel("试听进度，拖动跳转")
                 }
             }
             if workspace.draft.blocks.isEmpty {
@@ -657,44 +664,6 @@ private struct WorkbenchView: View {
         .overlay { RoundedRectangle(cornerRadius: 13).strokeBorder(line) }
         .padding(.horizontal, 27)
         .padding(.bottom, 13)
-    }
-
-    private var instrumentPicker: some View {
-        let available = workspace.availableParts
-        let enabled = workspace.enabledParts
-        return VStack(alignment: .leading, spacing: 12) {
-            HStack {
-                Text("乐器声部").font(.system(size: 16, weight: .bold))
-                Spacer()
-                Button("全选") { workspace.setAllParts(enabled: true) }
-                    .disabled(enabled == available)
-                Button("清空") { workspace.setAllParts(enabled: false) }
-                    .disabled(enabled.isEmpty)
-            }
-            if let style = workspace.style {
-                ForEach(AccompanimentPart.allCases) { part in
-                    let present = available.contains(part)
-                    let instrument = part.instrumentName(in: style)
-                    Toggle(isOn: Binding(get: { present && workspace.isPartEnabled(part) }, set: {
-                        workspace.setPart(part, enabled: $0)
-                    })) {
-                        HStack {
-                            Text(part.name).fontWeight(.medium)
-                            Spacer()
-                            Text(present ? instrument : "当前段落未使用").foregroundStyle(muted)
-                        }
-                    }
-                    .toggleStyle(.checkbox)
-                    .disabled(!present)
-                    .accessibilityLabel(part.name + "，" + (present ? instrument : "当前段落未使用"))
-                }
-            }
-            Text(enabled.isEmpty ? "至少选择一个声部，即可试听或导出。" : "仅试听和导出已勾选的声部。")
-                .font(.system(size: 11)).foregroundStyle(muted)
-        }
-        .frame(width: 280, alignment: .leading)
-        .padding(16)
-        .foregroundStyle(ink)
     }
 
     private var demoPicker: some View {
@@ -929,7 +898,7 @@ private struct WorkbenchView: View {
                     .contentShape(Rectangle())
                 }.buttonStyle(.plain)
             }
-            Text("在 Logic 打开 .mid 后，按 ⌘S 存成 .logicx。")
+            Text("WAV 保留音色与混音。MIDI 不含采样；双鼓轨合用标准鼓组。在 Logic 打开 .mid 后，按 ⌘S 存成 .logicx。")
                 .font(.system(size: 11)).foregroundStyle(muted)
         }
         .foregroundStyle(ink)
@@ -942,7 +911,7 @@ private struct WorkbenchView: View {
             Image(systemName: "checkmark.circle.fill").foregroundStyle(Color(hex: 0x297366))
             Text("已导出 \(exported.url.lastPathComponent)").lineLimit(1)
             Spacer()
-            Button("在 \(exported.format.title) 中打开") { workspace.openExport(exported) }
+            Button(exported.format == .audio ? "播放音频" : "在 \(exported.format.title) 中打开") { workspace.openExport(exported) }
             Button { workspace.exported = nil } label: { Image(systemName: "xmark") }
                 .buttonStyle(.plain).accessibilityLabel("关闭导出提示")
         }
