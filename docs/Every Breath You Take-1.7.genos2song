@@ -1,0 +1,226 @@
+{
+  "draft" : {
+    "blocks" : [
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "F#m9",
+          "D:1 Dadd9:3",
+          "E:1 Eadd9:3",
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3"
+        ],
+        "id" : "33F6B73A-84DD-4017-9E71-AA32D4827A04",
+        "name" : "前奏",
+        "pattern" : "Main A"
+      },
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "F#m9",
+          "D:1 Dadd9:3",
+          "E:1 Eadd9:3",
+          "F#m9",
+          "F#m9"
+        ],
+        "id" : "CA489469-87A3-475B-99D2-E11F33C80B1C",
+        "name" : "A · 1",
+        "pattern" : "Main B"
+      },
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "F#m9",
+          "D:1 Dadd9:3",
+          "E:1 Eadd9:3",
+          "A",
+          "A"
+        ],
+        "id" : "655DB005-ACD9-4064-B98C-C3D3B09EF8C4",
+        "name" : "A · 2",
+        "pattern" : "Main B"
+      },
+      {
+        "bars" : [
+          "Dadd9",
+          "Cadd9",
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "B:1 Badd9:3",
+          "B:1 Badd9:3",
+          "E:1 Eadd9:3",
+          "E:1 Eadd9:3"
+        ],
+        "id" : "79D424D5-EE32-487C-82D0-0BB73293FC39",
+        "name" : "B · 1",
+        "pattern" : "Main C"
+      },
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "F#m9",
+          "D:1 Dadd9:3",
+          "E:1 Eadd9:3",
+          "F#m9",
+          "F#m9"
+        ],
+        "id" : "512CB483-8D21-4B61-939F-6A5F5A437E50",
+        "name" : "A · 3",
+        "pattern" : "Main B"
+      },
+      {
+        "bars" : [
+          "F",
+          "F",
+          "G",
+          "G"
+        ],
+        "id" : "1F610299-3307-4899-A807-277C742F7242",
+        "name" : "C · 1",
+        "pattern" : "Main D"
+      },
+      {
+        "bars" : [
+          "F",
+          "F",
+          "G",
+          "G",
+          "F",
+          "F"
+        ],
+        "id" : "DD8B2760-8379-43DF-9CE2-A2FE68787082",
+        "name" : "C · 2",
+        "pattern" : "Main D"
+      },
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "F#m9",
+          "D:1 Dadd9:3",
+          "E:1 Eadd9:3",
+          "F#m9",
+          "F#m9"
+        ],
+        "id" : "9E2EF345-0603-4735-94B3-299B96B32EB6",
+        "name" : "A · 4（返奏）",
+        "pattern" : "Main B"
+      },
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "F#m9",
+          "D:1 Dadd9:3",
+          "E:1 Eadd9:3",
+          "A",
+          "A"
+        ],
+        "id" : "CCB2013A-5F4B-43B2-9C3D-7EF88C5526CA",
+        "name" : "A · 5（返奏）",
+        "pattern" : "Main B"
+      },
+      {
+        "bars" : [
+          "Dadd9",
+          "Cadd9",
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "B:1 Badd9:3",
+          "B:1 Badd9:3",
+          "E:1 Eadd9:3",
+          "E:1 Eadd9:3"
+        ],
+        "id" : "8EB21BFA-78BA-4A62-96CB-DDF56DE0FE38",
+        "name" : "B · 2（返奏）",
+        "pattern" : "Main C"
+      },
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "F#m9",
+          "D:1 Dadd9:3",
+          "E:1 Eadd9:3",
+          "F#m9",
+          "F#m9"
+        ],
+        "id" : "466201BE-EEA2-4064-A9DF-3A79A317BCCC",
+        "name" : "A · 6（返奏）",
+        "pattern" : "Main B"
+      },
+      {
+        "bars" : [
+          "D:1 Dadd9:3",
+          "E:1 Eadd9:3"
+        ],
+        "id" : "D4C7406F-1B4F-42B8-83FE-55B5165DA2EB",
+        "name" : "尾奏 · 1",
+        "pattern" : "Main A"
+      },
+      {
+        "bars" : [
+          "F#m9",
+          "F#m9"
+        ],
+        "id" : "342D41C8-0DCB-4B44-8FC7-D6E30E922263",
+        "name" : "尾奏 · 2",
+        "pattern" : "Main A"
+      },
+      {
+        "bars" : [
+          "F#m9",
+          "F#m9"
+        ],
+        "id" : "714860A1-7947-4CB2-A2AB-4188AE176A31",
+        "name" : "尾奏 · 3",
+        "pattern" : "Main A"
+      },
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "D:1 Dadd9:3"
+        ],
+        "id" : "97A2959C-19BE-4557-9A62-17A8C6C815A5",
+        "name" : "尾奏 · 4",
+        "pattern" : "Main A"
+      },
+      {
+        "bars" : [
+          "A:1 Aadd9:3",
+          "A:1 Aadd9:3",
+          "F#m9",
+          "D:1 Dadd9:3"
+        ],
+        "id" : "47600436-01CA-4F0F-9C2D-9423F8D9E4FE",
+        "name" : "尾奏 · 5",
+        "pattern" : "Main A"
+      }
+    ],
+    "bpm" : "125",
+    "key" : {
+      "fifths" : 3,
+      "minor" : false
+    },
+    "meter" : {
+      "beats" : 4,
+      "unit" : 4
+    },
+    "stylePath" : "pop\/SkyPop.T547.prs",
+    "title" : "Every Breath You Take"
+  },
+  "version" : 2
+}

@@ -1,0 +1,41 @@
+{
+  "draft" : {
+    "blocks" : [
+      {
+        "bars" : [
+          "Fm7",
+          "Gm7",
+          "Abmaj7 Gm7",
+          "Fm7",
+          "Fm7",
+          "Gm7",
+          "Abmaj7 Gm7",
+          "Fm7",
+          "Eb",
+          "Eb",
+          "Db Eb",
+          "Fm7",
+          "Eb",
+          "Eb",
+          "Db Eb",
+          "Fm7"
+        ],
+        "id" : "5EBB54AB-CFE6-4D7C-B738-738133CC74AD",
+        "name" : "主题",
+        "pattern" : "Main A"
+      }
+    ],
+    "bpm" : "180.001",
+    "key" : {
+      "fifths" : -4,
+      "minor" : true
+    },
+    "meter" : {
+      "beats" : 3,
+      "unit" : 4
+    },
+    "stylePath" : "jazz\/MediumJazzWaltz.T555.sst",
+    "title" : "Afro Blue"
+  },
+  "version" : 2
+}
